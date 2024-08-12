@@ -1,0 +1,7 @@
+name=aoqia's carwanna extended
+id=AoqiaCarwannaExtended
+description=An extended version of the original Carwanna mod by Xyberviri.
+poster=poster.png
+require=AoqiaZomboidUtils
+versionMin=41.78.16
+modVersion=0.0.1

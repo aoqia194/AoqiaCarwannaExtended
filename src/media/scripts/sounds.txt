@@ -1,0 +1,8 @@
+module AoqiaCarwannaExtended {
+    sound CreatePinkslip {
+        clip { file = media/sound/cw_pen1.ogg, }
+        clip { file = media/sound/cw_pen2.ogg, }
+        clip { file = media/sound/cw_pen3.ogg, }
+        clip { file = media/sound/cw_pen4.ogg, }
+    }
+}
