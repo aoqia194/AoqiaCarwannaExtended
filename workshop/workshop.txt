@@ -1,5 +1,5 @@
 version=1
-id=
+id=3308065498
 title=aoqia's carwanna extended
 description=This mod is an extention of the original CarWanna mod by Xyberviri and is completely open-source under the GPLv3 license.
 description=It is created at the request of a server owner and I don't have the most time to maintain it.
@@ -10,5 +10,5 @@ description=Credits go to the original mod owner Xyberviri.
 description=
 description=GitHub repository: https://github.com/aoqia194/AoqiaCarwannaExtended
 description=KoFi: https://ko-fi.com/aoqia
-tags=Build 41
+tags=Build 41;Interface;Items;Misc;Multiplayer;Vehicles
 visibility=public
