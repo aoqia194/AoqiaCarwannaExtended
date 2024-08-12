@@ -1,0 +1,25 @@
+module AoqiaCarwannaExtended {
+    item AutoForm {
+        DisplayCategory = AoqiaCarwannaExtended,
+        DisplayName = AutoForm,
+        Icon = AutoForm,
+        Type = Normal,
+        Weight = 0.1,
+        WorldStaticModel = AutoForm,
+    }
+
+    item Pinkslip {
+        DisplayCategory = AoqiaCarwannaExtended,
+        DisplayName = Pinkslip,
+        Icon = Pinkslip,
+        Tags = Pinkslip,
+        Type = Normal,
+        Weight = 0.1,
+        WorldStaticModel = Pinkslip,
+
+        Condition = 100.0,
+        GasTank = 100.0,
+        HasAKey = true,
+        VehicleId = Base.VanSpecial,
+    }
+}

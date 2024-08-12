@@ -1,0 +1,221 @@
+VERSION = 1,
+
+option AoqiaCarwannaExtended.AutoFormLootChance
+{
+	type = double,
+	default = 1.0,
+	min = 0.01,
+	max = 100.0,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_AutoFormLootChance,
+}
+
+option AoqiaCarwannaExtended.DoAdminOverride
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoAdminOverride,
+}
+
+option AoqiaCarwannaExtended.DoAutoFormLoot
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoAutoFormLoot,
+}
+
+option AoqiaCarwannaExtended.DoCanHotwire
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoCanHotwire,
+}
+
+option AoqiaCarwannaExtended.DoClearInventory
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoClearInventory,
+}
+
+option AoqiaCarwannaExtended.DoFixHiddenParts
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoFixHiddenParts,
+}
+
+option AoqiaCarwannaExtended.DoIgnoreHiddenParts
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoIgnoreHiddenParts,
+}
+
+option AoqiaCarwannaExtended.DoPinkslipLoot
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoPinkslipLoot,
+}
+
+option AoqiaCarwannaExtended.DoRegistration
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRegistration,
+}
+
+option AoqiaCarwannaExtended.DoRequiresAllParts
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRequiresAllParts,
+}
+
+option AoqiaCarwannaExtended.DoRequiresForm
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRequiresForm,
+}
+
+option AoqiaCarwannaExtended.DoRequiresKey
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRequiresKey,
+}
+
+option AoqiaCarwannaExtended.DoShowAllParts
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoShowAllParts,
+}
+
+option AoqiaCarwannaExtended.DoZedLoot
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoZedLoot,
+}
+
+option AoqiaCarwannaExtended.MinimumCondition
+{
+	type = integer,
+	default = 100,
+	min = 0,
+	max = 100,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_MinimumCondition,
+}
+
+option AoqiaCarwannaExtended.PartWhitelist = {
+	type = string,
+	default =,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_PartWhitelist,
+}
+
+option AoqiaCarwannaExtended.PinkslipLootBlacklist = {
+	type = string,
+	default =,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_PinkslipLootBlacklist,
+}
+
+option AoqiaCarwannaExtended.PinkslipLootChance = {
+	type = double,
+	default = 1.0,
+	min = 0.0001,
+	max = 100.0,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_PinkslipLootChance,
+}
+
+option AoqiaCarwannaExtended.TrailerBlacklist = {
+	type = string,
+	default = Base.UnimogTrailer;Base.TrailerTSMega;Base.TrailerFirst;Base.TrailerGenerator;Base.TrailerHome;Base.TrailerKbac;Base.TrailerSecond;Base.isoContainer2;Base.isoContainer3tanker;Base.isoContainer4;Base.isoContainer5;Base.TrailerKbacRSWater;Rotators.TrailerWaterSmall;Base.M870A1,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_TrailerBlacklist,
+}
+
+option AoqiaCarwannaExtended.VehicleBlacklist = {
+	type = string,
+	default =,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_VehicleBlacklist,
+}
+
+option AoqiaCarwannaExtended.ZedLootChance = {
+	type = double,
+	default = 0.01,
+	min = 0.0000001,
+	max = 100.0,
+
+    page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_ZedLootChance,
+}
+
+/* ----------------------- Mod Support Sandbox Options ---------------------- */
+
+option AoqiaCarwannaExtended.DoCompatColorExperimental
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoCompatColorExperimental,
+}
+
+option AoqiaCarwannaExtended.DoCompatTsarMod
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoCompatTsarMod,
+}
+
+option AoqiaCarwannaExtended.DoCompatUdderlyRespawn
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_UdderlyRespawn,
+}
