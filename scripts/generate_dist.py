@@ -1,84 +1,112 @@
 """ This is not a module. """
 
-import fnmatch
 import os
+import pathlib
+import re
 import shutil
 import sys
 
-SRC = "../src/"
-DEST = "../dist/"
 
-WORKSHOP = "../workshop/"
+def main():
+    """Main entry point."""
 
-EXCLUDE_PATTERNS = [
-    # Itself
-    "*.py",
-    # VSCode related files
-    "*.code-workspace",
-    ".luarc.json",
-    # Github repo files
-    ".gitignore",
-    "TODO.md",
-    "README.md",
-    "CHANGELOG.md",
-    "SANDBOX_OPTIONS.md",
-    # Blender files
-    "*.blend1",
-    # Photoshop files
-    "*.psd",
-]
-EXCLUDED_DIRS = [".git", ".github", ".vscode", "dist", "scripts", "blender", "workshop", "libs"]
+    script_path = pathlib.Path(__file__)
+    repo_path = script_path.parent.parent
 
-print("Getting mod id...")
+    src_path = repo_path.joinpath("src")
+    dist_path = repo_path.joinpath("dist")
+    workshop_path = repo_path.joinpath("workshop")
 
-MOD_ID = None
-with open(os.path.join(SRC, "mod.info"), "r", encoding="utf-8") as modinfo:
-    for line in modinfo.readlines():
-        if line.startswith("id="):
-            MOD_ID = line.removeprefix("id=")
+    excluded_patterns = [
+        r"^.+\.blend1$",
+        r"^.+\.psd$",
+    ]
 
-if MOD_ID is None:
-    print("Failed to find mod ID in mod.info.")
-    sys.exit(1)
+    excluded_dirs = [".vscode"]
+
+    # Get mod id for later use
+
+    print("Getting mod id...")
+
+    mod_id = None
+    with open(src_path.joinpath("mod.info"), "r", encoding="utf-8") as modinfo:
+        for line in modinfo.readlines():
+            if line.startswith("id="):
+                mod_id = line.removeprefix("id=").strip()
+                break
+
+    if mod_id is None:
+        print("Failed to find mod ID in mod.info.")
+        sys.exit(1)
+
+    print("Generating dist files...")
+
+    # Make dist folder (cleanup if it already exists)
+
+    if dist_path.exists():
+        for it in dist_path.iterdir():
+            os.remove(it.absolute())
+
+        dist_path.rmdir()
+
+    dist_path.mkdir()
+
+    # Create workshop folder tree
+
+    contents = dist_path.joinpath("Contents")
+    mods = contents.joinpath("mods")
+    mod_path = mods.joinpath(mod_id)
+    mod_path.mkdir(parents=True)
+
+    # Copy all source files to mod path in dest
+
+    for dirpath, _, filenames in src_path.walk():
+        for excluded_dir in excluded_dirs:
+            if dirpath.match(excluded_dir):
+                print("Matched excluded directory: ", excluded_dir)
+                break
+        else:  # No excluded directory found
+            for filename in filenames:
+                for pattern in excluded_patterns:
+                    if re.match(pattern, filename):
+                        print("Matched excluded pattern: ", pattern)
+                        break
+                else:
+                    src_file = dirpath.joinpath(filename)
+                    dest_file = mod_path.joinpath(pathlib.Path(*src_file.parts[4:]))
+
+                    print(f"Copying file {src_file} to {dest_file}")
+                    if not dest_file.parent.exists():
+                        dest_file.parent.mkdir(parents=True)
+                    
+                    shutil.copy2(src_file, dest_file)
+
+    # Copy all workshop files to workshop folder
+
+    for dirpath, _, filenames in workshop_path.walk():
+        for excluded_dir in excluded_dirs:
+            if dirpath.match(excluded_dir):
+                print("Matched excluded directory: ", excluded_dir)
+                break
+        else:  # No excluded directory found
+            for filename in filenames:
+                for pattern in excluded_patterns:
+                    if re.match(pattern, filename):
+                        print("Matched excluded pattern: ", pattern)
+                        break
+                else:
+                    src_file = dirpath.joinpath(filename)
+                    dest_file = dist_path.joinpath(pathlib.Path(*src_file.parts[4:]))
+
+                    print(f"Copying file {src_file} to {dest_file}")
+
+                    if not dest_file.parent.exists():
+                        dest_file.parent.mkdir(parents=True)
+
+                    shutil.copy2(src_file, dest_file)
+
+    print("Dist files generated successfully.")
 
 
-print("Generating dist files...")
-
-# Make and populate dist folder
-
-if not os.path.exists(DEST):
-    os.makedirs(DEST)
-
-for dirpath, dirnames, filenames in os.walk(SRC):
-    for excluded_dir in EXCLUDED_DIRS:
-        if excluded_dir in dirpath:
-            print("Matched directory\t", excluded_dir)
-            break
-    else:  # No excluded directory found
-        for filename in filenames:
-            for pattern in EXCLUDE_PATTERNS:
-                if fnmatch.fnmatch(filename, pattern):
-                    print("Matched pattern\t", pattern)
-                    break
-            else:
-                src_file = os.path.join(dirpath, filename)
-                dest_file = os.path.join(DEST, src_file[3:])
-                os.makedirs(os.path.dirname(dest_file), exist_ok=True)
-                shutil.copy2(src_file, dest_file)
-
-# Move contents of dist to the workshop folder
-
-Contents = os.path.join(WORKSHOP, "Contents")
-mods = os.path.join(Contents, "mods")
-mod_dir = os.path.join(mods, MOD_ID)
-if (
-    not os.path.exists(WORKSHOP)
-    or not os.path.exists(Contents)
-    or not os.path.exists(mods)
-    or not os.path.exists(mod_dir)
-):
-    sys.exit(1)
-
-shutil.copytree(DEST, mod_dir, dirs_exist_ok=True)
-
-print("Dist files generated successfully.")
+if __name__ == "__main__":
+    main()
