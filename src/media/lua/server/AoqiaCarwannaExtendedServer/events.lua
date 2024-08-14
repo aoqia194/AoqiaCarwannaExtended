@@ -2,14 +2,13 @@
 --            Handles event stuff like registering listeners/hooks.           --
 -- -------------------------------------------------------------------------- --
 
--- Vanilla Global Tables/Variables
-local Events = Events
+-- My modules.
+local blacklists = require("AoqiaCarwannaExtendedServer/blacklists")
+local commands = require("AoqiaCarwannaExtendedServer/commands")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
--- My Mod Modules
-local blacklists = require("AoqiaCarwannaExtended/blacklists")
-local commands = require("AoqiaCarwannaExtended/commands")
-local distributions = require("AoqiaCarwannaExtended/distributions")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+-- TIS globals.
+local Events = Events
 
 local logger = mod_constants.LOGGER
 
@@ -18,14 +17,14 @@ local logger = mod_constants.LOGGER
 local events = {}
 
 --- @type Callback_OnClientCommand
---- @param module string
---- @param command string
---- @param player IsoPlayer
---- @param args table
 function events.on_client_command(module, command, player, args)
+    -- This isn't being called when a client tries to send command to server.
+    logger:info_server("RAAAAAAAAAAAAAAAAAH")
+
     if module ~= mod_constants.MOD_ID then return end
     if commands[command] == nil then
         logger:info_server("Received non-existent client command %s.", command)
+        return
     end
 
     local parsedargs = ""

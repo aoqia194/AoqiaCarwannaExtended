@@ -9,11 +9,13 @@ local logger = require("AoqiaZomboidUtils/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "0.0.1"
+mod_constants.MOD_VERSION = "0.0.2"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
 mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
+
+-- ---------------------------- Class Definitions --------------------------- --
 
 --- @class ModDataDummy
 --- @field Battery unknown

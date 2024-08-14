@@ -5,7 +5,7 @@
 -- AoqiaCarwannaExtended requires.
 local constants = require("AoqiaZomboidUtils/constants")
 local aoqia_math = require("AoqiaZomboidUtils/math")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals cache.
 local InventoryItemFactory = InventoryItemFactory
@@ -18,6 +18,8 @@ local logger = mod_constants.LOGGER
 if  constants.IS_CLIENT
 and constants.IS_SINGLEPLAYER == false
 and constants.IS_COOP == false then
+    logger:debug_server("Commands logical-side check failed. IS_CLIENT=%s and IS_SINGLEPLAYER=%s.",
+        tostring(isClient()), tostring(isCoopHost()))
     return
 end
 
@@ -293,6 +295,8 @@ function commands.spawn_vehicle(player, args)
 
                 vehicle:transmitPartModData(part)
             end
+
+            break
         until true
     end
 

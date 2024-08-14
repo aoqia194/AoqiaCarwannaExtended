@@ -3,10 +3,10 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local events = require("AoqiaCarwannaExtended/events")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local events = require("AoqiaCarwannaExtendedClient/events")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
--- TIS globals cache
+-- TIS globals cache.
 local getActivatedMods = getActivatedMods
 
 local logger = mod_constants.LOGGER
@@ -20,4 +20,4 @@ end
 
 events.register()
 
-logger:debug_server("Lua init done!")
+logger:debug("Lua init done!")

@@ -3,7 +3,7 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals.
 local ISBaseTimedAction = ISBaseTimedAction
@@ -17,8 +17,6 @@ local logger = mod_constants.LOGGER
 local action_id = mod_constants.MOD_ID .. "_create_pinkslip"
 
 --- @class CreatePinkslipAction: ISBaseTimedAction
---- @field character IsoPlayer
---- @field vehicle BaseVehicle
 local create_pinkslip = ISBaseTimedAction:derive(action_id)
 
 function create_pinkslip:is_part_missing(part)
@@ -81,6 +79,8 @@ function create_pinkslip:perform()
     end
 
     mdata.Parts = mdata.Parts or {}
+    mdata.Parts.partId = {}
+
     local pdata = mdata.Parts
 
     local missing_parts = 0
@@ -89,11 +89,19 @@ function create_pinkslip:perform()
         -- Breaks are continue here!
         repeat
             local part = self.vehicle:getPartByIndex(i - 1)
-            local item = part:getInventoryItem() --[[@as DrainableComboItem]]
-            local item_type = part:getItemType()
-            local item_condition = item:getCondition()
             local part_id = part:getId()
             local part_condition = part:getCondition()
+
+            local item = part:getInventoryItem() --[[@as DrainableComboItem | nil]]
+            if item == nil then
+                logger:debug("Item of part %s does not exist or is missing. Breaking...", part_id)
+                missing_parts = missing_parts + 1
+
+                break
+            end
+
+            local item_type = part:getItemType()
+            local item_condition = item:getCondition()
 
             if  sbvars.DoIgnoreHiddenParts
             and part:getCategory() ~= "nodisplay"
@@ -111,12 +119,6 @@ function create_pinkslip:perform()
                     broken_parts = broken_parts + 1
                 end
 
-                break
-            end
-
-            -- If part is missing.
-            if item == nil then
-                missing_parts = missing_parts + 1
                 break
             end
 
@@ -145,20 +147,23 @@ function create_pinkslip:perform()
             if part_condition < 100 or item_condition < 100 then
                 broken_parts = broken_parts + 1
             end
+
+            break
         until true
     end
 
     mdata.Broken = broken_parts
     mdata.Missing = missing_parts
 
-    -- Give the player the pinkslip.
-    player_inventory:AddItem(item)
-
     -- Remove form item if required.
     if sbvars.DoRequiresForm then
         local form = player_inventory:getFirstTypeRecurse("AutoForm")
         form:getContainer():Remove(form)
     end
+
+    -- Give the player the pinkslip.
+    --- @diagnostic disable-next-line
+    player_inventory:AddItem(pinkslip)
 
     -- Remove the vehicle from the world.
     local args = { vehicle = self.vehicle:getId() }
@@ -188,7 +193,7 @@ end
 --- @param vehicle BaseVehicle
 --- @return CreatePinkslipAction
 function create_pinkslip:new(character, vehicle)
-    --- @type CreatePinkslipAction
+    --- @class CreatePinkslipAction: ISBaseTimedAction
     local o = {}
 
     setmetatable(o, self)

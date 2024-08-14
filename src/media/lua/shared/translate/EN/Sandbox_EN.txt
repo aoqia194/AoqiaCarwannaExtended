@@ -43,8 +43,8 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_DoZedLoot = "Enable Zombie Loot",
     Sandbox_AoqiaCarwannaExtended_DoZedLoot_tooltip = "Allows pinkslips to be found on zombies.",
 
-    Sandbox_AoqiaCarwannaExtended_MinmumCondition = "Minimum Part Condition",
-    Sandbox_AoqiaCarwannaExtended_MinmumCondition_tooltip = "Sets the minimum condition that all existing parts must be to convert a vehicle to a pinkslip.",
+    Sandbox_AoqiaCarwannaExtended_MinimumCondition = "Minimum Part Condition",
+    Sandbox_AoqiaCarwannaExtended_MinimumCondition_tooltip = "Sets the minimum condition that all existing parts must be to convert a vehicle to a pinkslip.",
     
     Sandbox_AoqiaCarwannaExtended_PartWhitelist = "Part Whitelist",
     Sandbox_AoqiaCarwannaExtended_PartWhitelist_tooltip = "A list of parts to remove the requirement from, to be repaired or installed to convert a vehicle to a pinkslip.<LINE>Example: GasTank;Heater;GloveBox",

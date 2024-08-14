@@ -3,8 +3,8 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local hooks = require("AoqiaCarwannaExtended/hooks")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local hooks = require("AoqiaCarwannaExtendedClient/hooks")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals cache.
 local Events = Events
@@ -21,7 +21,7 @@ end
 
 function events.register()
     logger:debug("Registering events...")
-
+    
     Events.OnGameBoot.Add(events.game_boot)
 end
 

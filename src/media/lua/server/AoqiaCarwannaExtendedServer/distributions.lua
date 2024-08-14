@@ -3,7 +3,7 @@
 -- -------------------------------------------------------------------------- --
 
 -- This mod requires
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- STDLIB globals cache.
 local table = table

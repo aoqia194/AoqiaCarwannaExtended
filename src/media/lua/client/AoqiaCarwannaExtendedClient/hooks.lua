@@ -2,8 +2,8 @@
 --                             Hook stuff for fun                             --
 -- -------------------------------------------------------------------------- --
 
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
-local pinkslip = require("AoqiaCarwannaExtended/ui/pinkslip")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
+local pinkslip = require("AoqiaCarwannaExtendedClient/ui/pinkslip")
 
 -- TIS globals.
 local ISVehicleMenu = ISVehicleMenu

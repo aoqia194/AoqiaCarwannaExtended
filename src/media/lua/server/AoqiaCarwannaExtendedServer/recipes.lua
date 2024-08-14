@@ -3,19 +3,17 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals cache.
 local getScriptManager = getScriptManager
+local Recipe = Recipe
 
 local logger = mod_constants.LOGGER
 
 -- ------------------------------ Module Start ------------------------------ --
 
-local recipes = {}
-recipes.can_perform = {}
-recipes.on_create = {}
-recipes.item_types = {}
+local recipes = { can_perform = {}, on_create = {}, item_types = {} }
 
 --- @param script_items ArrayList<Item>
 function recipes.item_types.pinkslip(script_items)
@@ -58,7 +56,7 @@ function recipes.on_create.claim_vehicle(
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
 
     -- The vehicle that is being requested by the player.
-    local vehicle = { type = mdata.VehicleId }
+    local vehicle = { Type = mdata.VehicleId }
     if mdata.Parts then
         -- Player-created pinkslip branch.
         vehicle.parts = mdata.Parts
@@ -66,46 +64,46 @@ function recipes.on_create.claim_vehicle(
         -- Premade pinkslip branch.
         -- NOTE: Previous code did type checks like type(mdata.val) == "number"
         -- TODO: It's really ugly, maybe we just loop mod table in mdata.
-        if mdata.Battery then vehicle.battery = mdata.Battery end
-        if mdata.Condition then vehicle.condition = mdata.Condition end
-        if mdata.EngineQuality then vehicle.enginequality = mdata.EngineQuality end
-        if mdata.GasTank then vehicle.gastank = mdata.GasTank end
-        if mdata.HasKey then vehicle.haskey = mdata.HasKey end
-        if mdata.Hotwire then vehicle.hotwire = true end
-        if mdata.OtherTank then vehicle.othertank = mdata.OtherTank end
-        if mdata.Rust then vehicle.rust = mdata.Rust end
-        if mdata.Skin then vehicle.skin = mdata.Skin end
-        if mdata.TirePsi then vehicle.tirepsi = mdata.TirePsi end
-        if mdata.Upgrade then vehicle.upgrade = true end
+        if mdata.Battery then vehicle.Battery = mdata.Battery end
+        if mdata.Condition then vehicle.Condition = mdata.Condition end
+        if mdata.EngineQuality then vehicle.EngineQuality = mdata.EngineQuality end
+        if mdata.GasTank then vehicle.GasTank = mdata.GasTank end
+        if mdata.HasKey then vehicle.HasKey = mdata.HasKey end
+        if mdata.Hotwire then vehicle.Hotwire = true end
+        if mdata.OtherTank then vehicle.OtherTank = mdata.OtherTank end
+        if mdata.Rust then vehicle.Rust = mdata.Rust end
+        if mdata.Skin then vehicle.Skin = mdata.Skin end
+        if mdata.TirePsi then vehicle.TirePsi = mdata.TirePsi end
+        if mdata.Upgrade then vehicle.Upgrade = true end
     end
 
     -- Transfer blood on parts if mod data has it.
     if mdata.Blood then
-        vehicle.blood.f = mdata.Blood.F
-        vehicle.blood.b = mdata.Blood.B
-        vehicle.blood.l = mdata.Blood.L
-        vehicle.blood.r = mdata.Blood.R
+        vehicle.Blood.F = mdata.Blood.F
+        vehicle.Blood.B = mdata.Blood.B
+        vehicle.Blood.L = mdata.Blood.L
+        vehicle.Blood.R = mdata.Blood.R
     end
 
     -- Transfer colours if the mod data has it.
     if mdata.Color then
-        vehicle.color.h = mdata.Color.H
-        vehicle.color.s = mdata.Color.S
-        vehicle.color.v = mdata.Color.V
+        vehicle.Color.H = mdata.Color.H
+        vehicle.Color.S = mdata.Color.S
+        vehicle.Color.V = mdata.Color.V
     end
 
-    vehicle.x = character:getX()
-    vehicle.y = character:getY()
+    vehicle.X = character:getX()
+    vehicle.Y = character:getY()
     -- vehicle.z = character:getZ()
-    vehicle.dir = character:getDir()
-    vehicle.clear = true
+    vehicle.Dir = character:getDir()
+    vehicle.Clear = true
 
     sendClientCommand(character, mod_constants.MOD_ID, "spawn_vehicle", vehicle)
 end
 
 -- Add all above to global namespace (required by recipes)
-Recipe.OnCanPerform.ClaimVehicle = recipes.can_perform.claim_vehicle
-Recipe.OnCreate.ClaimVehicle = recipes.on_create.claim_vehicle
-Recipe.GetItemTypes.Pinkslip = recipes.item_types.pinkslip
+Recipe.OnCanPerform[mod_constants.MOD_ID] = { ClaimVehicle = recipes.can_perform.claim_vehicle }
+Recipe.OnCreate[mod_constants.MOD_ID] = { ClaimVehicle = recipes.on_create.claim_vehicle }
+Recipe.GetItemTypes[mod_constants.MOD_ID] = { Pinkslip = recipes.item_types.pinkslip }
 
 return recipes

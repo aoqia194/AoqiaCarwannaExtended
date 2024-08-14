@@ -3,8 +3,8 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local distributions = require("AoqiaCarwannaExtended/distributions")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local distributions = require("AoqiaCarwannaExtendedServer/distributions")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals
 local string = string
@@ -28,7 +28,7 @@ blacklists.trailer_blacklist = {}
 blacklists.vehicle_blacklist = {}
 
 function blacklists.init()
-    logger:debug("Parsing blacklists from SandboxVars.")
+    logger:debug_server("Parsing blacklists from SandboxVars.")
 
     local sbvars = SandboxVars[mod_constants.MOD_ID]
     --- @cast sbvars SandboxVarsDummy
