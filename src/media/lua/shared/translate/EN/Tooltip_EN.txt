@@ -1,10 +1,11 @@
 Tooltip_EN = {
     Tooltip_AoqiaCarwannaExtended_Aegis = "Owned Vehicle",
     Tooltip_AoqiaCarwannaExtended_Blacklisted = "Blacklisted",
-    Tooltip_AoqiaCarwannaExtended_ClaimOutSide = "Can only be claimed on the ground outside.",
+    Tooltip_AoqiaCarwannaExtended_ClaimOutside = "Can only be claimed on the ground outside.",
     Tooltip_AoqiaCarwannaExtended_DoAdminOverride = "Admin Override",
+    Tooltip_AoqiaCarwannaExtended_DoSafehouseOnly = "Can only be claimed in or near a safehouse protected area.",
     Tooltip_AoqiaCarwannaExtended_Fail = "Fail",
-    Tooltip_AoqiaCarwannaExtended_HasItems = "Has Items",
+    Tooltip_AoqiaCarwannaExtended_HasItems = "There are items in the vehicle parts listed below.",
     Tooltip_AoqiaCarwannaExtended_HasKey = "Has Key",
     Tooltip_AoqiaCarwannaExtended_Hotwired = "Hotwired",
     Tooltip_AoqiaCarwannaExtended_Install = "Parts Missing",
@@ -12,6 +13,6 @@ Tooltip_EN = {
     Tooltip_AoqiaCarwannaExtended_NeedsKey  = "Needs Key",
     Tooltip_AoqiaCarwannaExtended_Pass = "Pass",
     Tooltip_AoqiaCarwannaExtended_Passengers = "Occupied",
-    Tooltip_AoqiaCarwannaExtended_Repair = "Parts Damaged, min ",
+    Tooltip_AoqiaCarwannaExtended_Repair = "Parts Damaged",
     Tooltip_AoqiaCarwannaExtended_TrailerKey = "Not Needed",
 }
