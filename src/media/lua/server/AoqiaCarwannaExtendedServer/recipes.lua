@@ -6,8 +6,10 @@
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals cache.
+local getCell = getCell
 local getScriptManager = getScriptManager
 local Recipe = Recipe
+local sendClientCommand = sendClientCommand
 
 local logger = mod_constants.LOGGER
 
@@ -56,49 +58,56 @@ function recipes.on_create.claim_vehicle(
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
 
     -- The vehicle that is being requested by the player.
-    local vehicle = { Type = mdata.VehicleId }
+    local args = { VehicleId = mdata.VehicleId }
     if mdata.Parts then
         -- Player-created pinkslip branch.
-        vehicle.parts = mdata.Parts
+        args.parts = mdata.Parts
     else
         -- Premade pinkslip branch.
-        -- NOTE: Previous code did type checks like type(mdata.val) == "number"
-        -- TODO: It's really ugly, maybe we just loop mod table in mdata.
-        if mdata.Battery then vehicle.Battery = mdata.Battery end
-        if mdata.Condition then vehicle.Condition = mdata.Condition end
-        if mdata.EngineQuality then vehicle.EngineQuality = mdata.EngineQuality end
-        if mdata.GasTank then vehicle.GasTank = mdata.GasTank end
-        if mdata.HasKey then vehicle.HasKey = mdata.HasKey end
-        if mdata.Hotwire then vehicle.Hotwire = true end
-        if mdata.OtherTank then vehicle.OtherTank = mdata.OtherTank end
-        if mdata.Rust then vehicle.Rust = mdata.Rust end
-        if mdata.Skin then vehicle.Skin = mdata.Skin end
-        if mdata.TirePsi then vehicle.TirePsi = mdata.TirePsi end
-        if mdata.Upgrade then vehicle.Upgrade = true end
+        if mdata.Battery then args.Battery = mdata.Battery end
+        if mdata.Condition then args.Condition = mdata.Condition end
+        if mdata.EngineLoudness then args.EngineLoudness = mdata.EngineLoudness end
+        if mdata.EnginePower then args.EnginePower = mdata.EnginePower end
+        if mdata.EngineQuality then args.EngineQuality = mdata.EngineQuality end
+        if mdata.GasTank then args.GasTank = mdata.GasTank end
+        if mdata.HasKey then args.HasKey = true end
+        if mdata.HeadlightsActive then args.HeadlightsActive = true end
+        if mdata.HeaterActive then args.HeaterActive = true end
+        if mdata.Hotwire then args.Hotwire = true end
+        if mdata.LockedDoor then args.LockedDoor = true end
+        if mdata.LockedTrunk then args.LockedTrunk = true end
+        if mdata.OtherTank then args.OtherTank = mdata.OtherTank or mdata.FuelTank end
+        if mdata.Rust then args.Rust = mdata.Rust end
+        if mdata.Skin then args.Skin = mdata.Skin end
+        if mdata.TirePsi then args.TirePsi = mdata.TirePsi end
+        if mdata.Upgrade then args.Upgrade = true end
     end
 
-    -- Transfer blood on parts if mod data has it.
+    -- Transfer blood on partst.
     if mdata.Blood then
-        vehicle.Blood.F = mdata.Blood.F
-        vehicle.Blood.B = mdata.Blood.B
-        vehicle.Blood.L = mdata.Blood.L
-        vehicle.Blood.R = mdata.Blood.R
+        args.Blood = args.Blood or {}
+        args.Blood.F = mdata.Blood.F
+        args.Blood.B = mdata.Blood.B
+        args.Blood.L = mdata.Blood.L
+        args.Blood.R = mdata.Blood.R
     end
 
-    -- Transfer colours if the mod data has it.
+    -- Transfer colours.
     if mdata.Color then
-        vehicle.Color.H = mdata.Color.H
-        vehicle.Color.S = mdata.Color.S
-        vehicle.Color.V = mdata.Color.V
+        args.Color = args.Color or {}
+        args.Color.H = mdata.Color.H
+        args.Color.S = mdata.Color.S
+        args.Color.V = mdata.Color.V
     end
 
-    vehicle.X = character:getX()
-    vehicle.Y = character:getY()
-    -- vehicle.z = character:getZ()
-    vehicle.Dir = character:getDir()
-    vehicle.Clear = true
+    args.X = character:getX()
+    args.Y = character:getY()
+    args.Z = character:getZ()
 
-    sendClientCommand(character, mod_constants.MOD_ID, "spawn_vehicle", vehicle)
+    args.Dir = character:getDir()
+    args.Clear = true
+
+    sendClientCommand(character, mod_constants.MOD_ID, "spawn_vehicle", args)
 end
 
 -- Add all above to global namespace (required by recipes)
