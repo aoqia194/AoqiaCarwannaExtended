@@ -71,6 +71,7 @@ function recipes.on_create.claim_vehicle(
         if mdata.EngineQuality then args.EngineQuality = mdata.EngineQuality end
         if mdata.GasTank then args.GasTank = mdata.GasTank end
         if mdata.HasKey then args.HasKey = true end
+        if mdata.MakeKey then args.MakeKey = true end
         if mdata.HeadlightsActive then args.HeadlightsActive = true end
         if mdata.HeaterActive then args.HeaterActive = true end
         if mdata.Hotwire then args.Hotwire = true end
