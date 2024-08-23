@@ -1,6 +1,6 @@
 module AoqiaCarwannaExtended {
     recipe Claim Vehicle {
-        [Recipe.GetItemTypes.AoqiaCarwannaExtended.PinkSlip],
+        [Recipe.GetItemTypes.AoqiaCarwannaExtended.Pinkslip],
         Result:Base.CarKey,
         Time:50.0,
 

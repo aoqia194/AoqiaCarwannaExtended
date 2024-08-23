@@ -3,12 +3,14 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals.
+local getText = getText
 local ISBaseTimedAction = ISBaseTimedAction
 local Metabolics = Metabolics
 local SandboxVars = SandboxVars
+local sendClientCommand = sendClientCommand
 
 local logger = mod_constants.LOGGER
 
@@ -17,8 +19,6 @@ local logger = mod_constants.LOGGER
 local action_id = mod_constants.MOD_ID .. "_create_pinkslip"
 
 --- @class CreatePinkslipAction: ISBaseTimedAction
---- @field character IsoPlayer
---- @field vehicle BaseVehicle
 local create_pinkslip = ISBaseTimedAction:derive(action_id)
 
 function create_pinkslip:is_part_missing(part)
@@ -60,15 +60,24 @@ function create_pinkslip:perform()
     pinkslip:setName("Pinkslip: " .. vehicle_name .. " (used)")
 
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
-    mdata.BloodF = self.vehicle:getBloodIntensity("Front")
-    mdata.BloodB = self.vehicle:getBloodIntensity("Rear")
-    mdata.BloodL = self.vehicle:getBloodIntensity("Left")
-    mdata.BloodR = self.vehicle:getBloodIntensity("Right")
-    mdata.ColorH = self.vehicle:getColorHue()
-    mdata.ColorS = self.vehicle:getColorSaturation()
-    mdata.ColorV = self.vehicle:getColorValue()
+    mdata.Blood = mdata.Blood or {}
+    mdata.Color = mdata.Color or {}
+    mdata.Parts = mdata.Parts or {}
+
+    mdata.Blood.F = self.vehicle:getBloodIntensity("Front")
+    mdata.Blood.B = self.vehicle:getBloodIntensity("Rear")
+    mdata.Blood.L = self.vehicle:getBloodIntensity("Left")
+    mdata.Blood.R = self.vehicle:getBloodIntensity("Right")
+    mdata.Color.H = self.vehicle:getColorHue()
+    mdata.Color.S = self.vehicle:getColorSaturation()
+    mdata.Color.V = self.vehicle:getColorValue()
+    mdata.EngineLoudness = self.vehicle:getEngineLoudness()
+    mdata.EnginePower = self.vehicle:getEnginePower()
     mdata.EngineQuality = self.vehicle:getEngineQuality()
+    mdata.HeadlightsActive = self.vehicle:getHeadlightsOn()
     mdata.Hotwire = self.vehicle:isHotwired()
+    mdata.LockedDoor = self.vehicle:isAnyDoorLocked()
+    mdata.LockedTrunk = self.vehicle:isTrunkLocked()
     mdata.Skin = self.vehicle:getSkinIndex()
     mdata.Rust = self.vehicle:getRust()
     mdata.VehicleId = vehicle_script:getFullName()
@@ -80,7 +89,6 @@ function create_pinkslip:perform()
         key:getContainer():Remove(key)
     end
 
-    mdata.Parts = mdata.Parts or {}
     local pdata = mdata.Parts
 
     local missing_parts = 0
@@ -89,11 +97,19 @@ function create_pinkslip:perform()
         -- Breaks are continue here!
         repeat
             local part = self.vehicle:getPartByIndex(i - 1)
-            local item = part:getInventoryItem() --[[@as DrainableComboItem]]
-            local item_type = part:getItemType()
-            local item_condition = item:getCondition()
             local part_id = part:getId()
             local part_condition = part:getCondition()
+
+            local item = part:getInventoryItem() --[[@as DrainableComboItem | nil]]
+            if item == nil then
+                logger:debug("Item of part %s does not exist or is missing.", part_id)
+                missing_parts = missing_parts + 1
+
+                break
+            end
+
+            local item_type = part:getItemType()
+            local item_condition = item:getCondition()
 
             if  sbvars.DoIgnoreHiddenParts
             and part:getCategory() ~= "nodisplay"
@@ -104,9 +120,17 @@ function create_pinkslip:perform()
                 break
             end
 
+            --- @diagnostic disable-next-line
+            pdata[part_id] = {}
+            local piddata = pdata[part_id]
+
+            -- If the part has mod data to sync.
+            local part_mdata = part:getModData()
+            if part_mdata then piddata.ModData = part_mdata end
+
             -- If the parts have items we can remove.
             if item_type and item_type:isEmpty() == false then
-                pdata.partId.Condition = part_condition
+                piddata.Condition = part_condition
                 if part_condition < 100 then
                     broken_parts = broken_parts + 1
                 end
@@ -114,58 +138,55 @@ function create_pinkslip:perform()
                 break
             end
 
-            -- If part is missing.
-            if item == nil then
-                missing_parts = missing_parts + 1
-                break
-            end
-
-            pdata.partId.Condition = item_condition
-            pdata.partId.Item = item:getFullType()
+            piddata.Condition = item_condition
+            piddata.Item = item:getFullType()
 
             -- The part holds fluids.
             if part:isContainer() and part:getItemContainer() == nil then
-                pdata.partId.Content = part:getContainerContentAmount()
+                piddata.Content = part:getContainerContentAmount()
             end
 
             -- The part is a battery.
             if item:IsDrainable() then
-                pdata.partId.Delta = item:getUsedDelta()
+                piddata.Delta = item:getUsedDelta()
             end
 
             -- TsarLib mod support
-            local part_mdata = part:getModData()
-            if  sbvars.DoCompatTsarMod
-            and part_mdata.tuning2
-            and part_mdata.tuning2.model then
-                pdata.partId.Model = part_mdata.tuning2.model
-            end
+            -- if  sbvars.DoCompatTsarMod
+            -- and part_mdata.tuning2
+            -- and part_mdata.tuning2.model then
+            --     piddata.Model = part_mdata.tuning2.model
+            -- end
 
             -- Count broken parts
             if part_condition < 100 or item_condition < 100 then
                 broken_parts = broken_parts + 1
             end
+
+            break
         until true
     end
 
-    mdata.Broken = broken_parts
-    mdata.Missing = missing_parts
-
-    -- Give the player the pinkslip.
-    player_inventory:AddItem(item)
+    mdata.PartsBroken = broken_parts
+    mdata.PartsMissing = missing_parts
 
     -- Remove form item if required.
-    if sbvars.DoRequiresForm then
+    if sbvars.DoRequiresForm and sbvars.DoKeepForm then
         local form = player_inventory:getFirstTypeRecurse("AutoForm")
         form:getContainer():Remove(form)
     end
+
+    -- Give the player the pinkslip.
+    --- @diagnostic disable-next-line
+    player_inventory:AddItem(pinkslip)
 
     -- Remove the vehicle from the world.
     local args = { vehicle = self.vehicle:getId() }
     sendClientCommand(self.character, "vehicle", "remove", args)
 
+    -- Spawn a replacement vehicle somewhere as to repopulate the vehicles in the world.
     if UdderlyVehicleRespawn and sbvars.DoCompatUdderlyRespawn then
-        -- TODO: Implement.
+        UdderlyVehicleRespawn.SpawnRandomVehicleSomewhere()
     end
 
     ISBaseTimedAction.perform(self)
@@ -188,7 +209,7 @@ end
 --- @param vehicle BaseVehicle
 --- @return CreatePinkslipAction
 function create_pinkslip:new(character, vehicle)
-    --- @type CreatePinkslipAction
+    --- @class CreatePinkslipAction: ISBaseTimedAction
     local o = {}
 
     setmetatable(o, self)

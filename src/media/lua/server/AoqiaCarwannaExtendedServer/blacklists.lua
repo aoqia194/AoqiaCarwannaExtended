@@ -3,8 +3,9 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local distributions = require("AoqiaCarwannaExtended/distributions")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local constants = require("AoqiaZomboidUtilsShared/constants")
+local distributions = require("AoqiaCarwannaExtendedServer/distributions")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals
 local string = string
@@ -28,15 +29,13 @@ blacklists.trailer_blacklist = {}
 blacklists.vehicle_blacklist = {}
 
 function blacklists.init()
-    logger:debug("Parsing blacklists from SandboxVars.")
+    logger:debug_server("Parsing blacklists from SandboxVars.")
 
     local sbvars = SandboxVars[mod_constants.MOD_ID]
     --- @cast sbvars SandboxVarsDummy
 
     -- Part Whitelist
     if #sbvars.PartWhitelist > 0 then
-        -- FIXME: Fix your fucking shit and stop using string
-        -- FIXME: Don't use ipairs here as it's slow as BRICKS
         local temp = string.split(sbvars.PartWhitelist, ";")
         for i = 1, #temp do
             blacklists.part_whitelist[i] = { temp[i], true }
@@ -45,8 +44,6 @@ function blacklists.init()
 
     -- Vehicle Blacklist
     if #sbvars.VehicleBlacklist > 0 then
-        -- FIXME: Fix your fucking shit and stop using string
-        -- FIXME: Don't use ipairs here as it's slow as BRICKS
         local temp = string.split(sbvars.VehicleBlacklist, ";")
         for i = 1, #temp do
             blacklists.vehicle_blacklist[i] = { temp[i], true }
@@ -55,8 +52,6 @@ function blacklists.init()
 
     -- Trailer Blacklist
     if #sbvars.TrailerBlacklist > 0 then
-        -- FIXME: Fix your fucking shit and stop using string
-        -- FIXME: Don't use ipairs here as it's slow as BRICKS
         local temp = string.split(sbvars.TrailerBlacklist, ";")
         for i = 1, #temp do
             blacklists.trailer_blacklist[i] = { temp[i], true }
@@ -71,9 +66,7 @@ function blacklists.init()
         distributions.add_pinkslip()
 
         -- Loot Blacklist
-        if #sbvars.LootBlacklist > 0 then
-            -- FIXME: Fix your fucking shit and stop using string
-            -- FIXME: Don't use ipairs here as it's slow as BRICKS
+        if sbvars.LootBlacklist == "" then
             local temp = string.split(sbvars.LootBlacklist, ";")
             for i = 1, #temp do
                 blacklists.loot_blacklist[i] = { temp[i], true }

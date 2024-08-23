@@ -3,8 +3,8 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local aoqia_math = require("AoqiaZomboidUtils/math")
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
+local aoqia_math = require("AoqiaZomboidUtilsShared/math")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals.
 local getCore = getCore
@@ -40,6 +40,8 @@ local screen_height = core:getScreenHeight()
 
 local text_manager = nil
 
+--- @param self self
+--- @param hard_width? float
 function tooltip.render_override(self, hard_width)
     if ISContextMenu.instance and ISContextMenu.instance.visibleCheck then
         return
@@ -75,6 +77,11 @@ function tooltip.render_override(self, hard_width)
         self.tooltip:setY(aoqia_math.max(0, aoqia_math.min(my, screen_height - th - 1)))
     end
 
+    self:setX(self.tooltip:getX() - 11)
+    self:setY(self.tooltip:getY())
+    self:setWidth(hard_width or (tw + 11))
+    self:setHeight(th)
+
     if self.followMouse then
         self:adjustPositionToAvoidOverlap({
             x = mx - 24 * 2,
@@ -108,7 +115,7 @@ function tooltip.render_override(self, hard_width)
 end
 
 tooltip.o_render = ISToolTipInv.render
----@diagnostic disable-next-line: duplicate-set-field
+--- @diagnostic disable-next-line: duplicate-set-field
 function ISToolTipInv:render()
     if ISContextMenu.instance and ISContextMenu.instance.visibleCheck then
         return
@@ -129,7 +136,7 @@ function ISToolTipInv:render()
 
     local text = getText("IGUI_AoqiaCarwannaExtended_Tooltip",
         tostring(mdata.EngineQuality),
-        tostring(mdata.Broken),
+        tostring(mdata.PartsBroken),
         tostring(mdata.Skin),
         tostring(mdata.HasKey),
         tostring(mdata.Hotwire)

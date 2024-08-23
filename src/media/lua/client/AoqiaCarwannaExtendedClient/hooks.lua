@@ -2,8 +2,8 @@
 --                             Hook stuff for fun                             --
 -- -------------------------------------------------------------------------- --
 
-local mod_constants = require("AoqiaCarwannaExtended/mod_constants")
-local pinkslip = require("AoqiaCarwannaExtended/ui/pinkslip")
+local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
+local pinkslip = require("AoqiaCarwannaExtendedClient/ui/pinkslip")
 
 -- TIS globals.
 local ISVehicleMenu = ISVehicleMenu
@@ -26,7 +26,7 @@ function hooks.fill_menu(player_num, context, vehicle, test)
 end
 
 function hooks.register()
-    logger:debug("Hooking FillMenuOutsideVehicle...")
+    logger:debug("Hooking FillMenuOutsideVehicle.")
     hooks.o_fill_menu = ISVehicleMenu.FillMenuOutsideVehicle
     ISVehicleMenu.FillMenuOutsideVehicle = hooks.fill_menu
 end
