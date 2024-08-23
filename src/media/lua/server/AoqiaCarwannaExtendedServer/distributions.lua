@@ -3,6 +3,7 @@
 -- -------------------------------------------------------------------------- --
 
 -- This mod requires
+local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- STDLIB globals cache.
@@ -80,7 +81,7 @@ function distributions.add_pinkslip_vehicle(item_name, chance)
     if sbvars.DoFormLoot == false then return end
 
     local tbl = {
-        containers = { "PinkSlips" },
+        containers = { "pinkslips" },
         items = { { ["item"] = item_name, ["chance"] = chance } },
     }
     distributions.register_procedural(tbl)
@@ -99,7 +100,7 @@ end
 
 --- Adds the PinkSlip item to the SuburbsDistributions.
 function distributions.add_pinkslip()
-    logger:debug_server("Adding PinkSlip item to loot tables.")
+    logger:debug_server("Adding Pinkslip item to loot tables.")
 
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     local dummy = { rolls = 1, items = {}, junk = { rolls = 1, items = {} } }
@@ -109,7 +110,7 @@ function distributions.add_pinkslip()
     end
 
     -- TODO: I think this isn't the way to do it. Maybe do it like add_pinkslip_zombie.
-    local proclist = { name = "PinkSlips", min = 0, max = 1, weightChance = sbvars.LootChance }
+    local proclist = { name = "pinkslips", min = 0, max = 1, weightChance = sbvars.LootChance }
     local tbl = {
         mechanic = { "crate", "metal_shelves" },
         pawnshop = { "counter", "displaycase" },
