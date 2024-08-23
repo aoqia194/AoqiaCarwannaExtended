@@ -4,14 +4,15 @@ IGUI_EN =
 
     IGUI_AoqiaCarwannaExtended_AutoForm = "Auto Form",
     IGUI_AoqiaCarwannaExtended_Pinkslip = "Pinkslip",
-
     IGUI_AoqiaCarwannaExtended_Confirm = "Convert %s into a pinkslip?",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Vehicle = "Vehicle: ",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Invalid = "ERROR THIS PINKSLIP IS INVALID!!!",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Skin = "Body Style: ",
+    IGUI_AoqiaCarwannaExtended_ConfirmWarning = "THIS WILL WIPE THE INTERIOR OF THE VEHICLE!!!",
+    
+    IGUI_AoqiaCarwannaExtended_Tooltip_Vehicle = "Vehicle",
+    IGUI_AoqiaCarwannaExtended_Tooltip_Skin = "Body Style",
     IGUI_AoqiaCarwannaExtended_Tooltip_Key = "Has Key",
     IGUI_AoqiaCarwannaExtended_Tooltip_Hotwired = "Hotwired",
-    IGUI_AoqiaCarwannaExtended_Tooltip_EngineQuality = "Engine Quality: ",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Missing = "Missing Parts: ",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Broken = "Broken Parts: ",
+    IGUI_AoqiaCarwannaExtended_Tooltip_EngineQuality = "Engine Quality",
+    IGUI_AoqiaCarwannaExtended_Tooltip_Missing = "Missing Parts",
+    IGUI_AoqiaCarwannaExtended_Tooltip_Broken = "Broken Parts",
+    IGUI_AoqiaCarwannaExtended_Tooltip_Invalid = "THIS PINKSLIP IS INVALID!",
 }
