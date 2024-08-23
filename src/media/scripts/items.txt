@@ -19,7 +19,7 @@ module AoqiaCarwannaExtended {
 
         Condition = 100.0,
         GasTank = 100.0,
-        HasAKey = true,
+        HasKey = true,
         VehicleId = Base.VanSpecial,
     }
 }
