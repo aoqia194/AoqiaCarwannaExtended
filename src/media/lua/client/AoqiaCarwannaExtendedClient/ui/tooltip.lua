@@ -6,10 +6,15 @@
 local aoqia_math = require("AoqiaZomboidUtilsShared/math")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
+-- std globals
+local pairs = pairs
+local tostring = tostring
+
 -- TIS globals.
 local getCore = getCore
 local getMouseX = getMouseX
 local getMouseY = getMouseY
+local getText = getText
 local getTextManager = getTextManager
 local ISContextMenu = ISContextMenu
 local ISToolTipInv = ISToolTipInv
@@ -134,13 +139,7 @@ function ISToolTipInv:render()
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     local mdata = item:getModData() --[[@as ModDataDummy]]
 
-    local text = getText("IGUI_AoqiaCarwannaExtended_Tooltip",
-        tostring(mdata.EngineQuality),
-        tostring(mdata.PartsBroken),
-        tostring(mdata.Skin),
-        tostring(mdata.HasKey),
-        tostring(mdata.Hotwire)
-    ) or "NULL_TRANSLATION"
+    local text = getText("IGUI_AoqiaCarwannaExtended_Tooltip") or "NULL_TRANSLATION"
 
     if sbvars.DoShowAllParts then
         for part, data in pairs(mdata.Parts) do
