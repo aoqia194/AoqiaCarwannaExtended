@@ -13,6 +13,7 @@ local math = math
 local table = table
 -- TIS globals.
 local getSquare = getSquare
+local getText = getText
 local ISModalRichText = ISModalRichText
 local ISTimedActionQueue = ISTimedActionQueue
 local ISToolTip = ISToolTip
@@ -102,6 +103,8 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     if sbvars.DoRegistration == false then return end
 
+    local mdata = vehicle:getModData() --[[@as ModDataDummy]]
+
     local player_inv = player:getInventory()
 
     local vehicle_script = vehicle:getScript()
@@ -157,7 +160,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     text = text ..
         (" <LINE> <RGB:1,1,1> %s <LINE> "):format(getText(("Tooltip_%s_Key"):format(mod_constants
             .MOD_ID)))
-    if key == nil then
+    if key == nil and mdata.HasKey == false then
         local ktcolour = " <RGB:1,1,0> "
         local endtext = getText(("Tooltip_%s_NeedsKey"):format(mod_constants.MOD_ID))
 
@@ -346,17 +349,20 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             end
         end
 
+        if sq_dist == nil then
+            logger:debug("sq_dist was nil, even after safehouse loop.")
+        end
+
         -- Is the player in the safehouse area?
         local in_safehouse_area = sq_dist and (player_sq_x >= sq_x and player_sq_x <= sq_x2) and
             (player_sq_y >= sq_y and player_sq_y <= sq_y2)
 
-        -- If `sq_dist` is nil, assume there were no safehouses found.
-        -- If we have safehouse distance disabled and are in the safehouse.
-        -- If safehouse distance enabled and we aren't in the safehouse or near it.
+        -- If `sq_dist` is nil, there were no safehouses found.
+        -- If we have safehouse distance disabled and are not in the safehouse.
+        -- If safehouse distance enabled and we aren't in the safehouse or the distance is too big.
         if sq_dist == nil
         or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
-        or (sbvars.SafehouseDistance > 0 and
-            (in_safehouse_area == false or sq_dist > sbvars.SafehouseDistance)) then
+        or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
             text = text ..
                 " <LINE> <LINE> <RGB:1,0,0> " ..
                 getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants.MOD_ID))
