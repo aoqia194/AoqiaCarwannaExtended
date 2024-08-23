@@ -9,12 +9,15 @@ local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 require("luautils")
 
 -- std globals.
+local math = math
 local table = table
 -- TIS globals.
-local ISModalDialog = ISModalDialog
+local getSquare = getSquare
+local ISModalRichText = ISModalRichText
 local ISTimedActionQueue = ISTimedActionQueue
 local ISToolTip = ISToolTip
 local luautils = luautils
+local SafeHouse = SafeHouse
 local SandboxVars = SandboxVars
 
 local logger = mod_constants.LOGGER
@@ -71,11 +74,12 @@ function pinkslip.confirm_dialog(player, vehicle)
     local player_num = player:getPlayerNum()
     local vehicle_script = vehicle:getScript()
 
-    local confirm_text = getText(("IGUI_%s_Confirm"):format(mod_constants.MOD_ID)) or
-        "NULL_TRANSLATION"
+    local confirm_text = getText(("IGUI_%s_Confirm"):format(mod_constants.MOD_ID)) --[[@as string]]
+        .. " <LINE> <RGB:1,0,0> "
+        .. getText(("IGUI_%s_ConfirmWarning"):format(mod_constants.MOD_ID))
     local message = confirm_text:format(getText("IGUI_VehicleName" .. vehicle_script:getName()))
 
-    local modal = ISModalDialog:new(
+    local modal = ISModalRichText:new(
         0,
         0,
         300,
@@ -299,6 +303,68 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         logger:debug("Adding pinkslip option to menu failed: Vehicle blacklisted from pinkslip use.")
     end
 
+    -- If safehouse only.
+    if sbvars.DoSafehouseOnly then
+        local player_sq = player:getSquare()
+        local player_sq_x = player_sq:getX()
+        local player_sq_y = player_sq:getY()
+
+        -- Dist from `player_sq` to `sq`.
+        local sq_dist = nil
+        -- Safehouse middle square area.
+        local sq_x = nil
+        local sq_y = nil
+        local sq_x2 = nil
+        local sq_y2 = nil
+
+        -- Loop through the safehouses and get the closest one.
+        local safehouses = SafeHouse.getSafehouseList()
+        for i = 1, safehouses:size() do
+            local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
+            if temp == nil then
+                logger:error("Safehouse was nil while looping through the safehouse list.")
+                break
+            end
+
+            -- Get the closest safehouse recursively.
+            if temp:playerAllowed(player) then
+                local x = temp:getX()
+                local y = temp:getY()
+                local x2 = temp:getX2()
+                local y2 = temp:getY2()
+
+                local center = getSquare(math.max(0, x2 - (x2 - x)), math.max(0, y2 - (y2 - y)), 0)
+                -- If distance is shorter, update the tracked `sq` and it's data.
+                local dist = player_sq:DistTo(center)
+                if sq_dist == nil or dist < sq_dist then
+                    sq_dist = dist
+                    sq_x = x
+                    sq_y = y
+                    sq_x2 = x2
+                    sq_y2 = y2
+                end
+            end
+        end
+
+        -- Is the player in the safehouse area?
+        local in_safehouse_area = sq_dist and (player_sq_x >= sq_x and player_sq_x <= sq_x2) and
+            (player_sq_y >= sq_y and player_sq_y <= sq_y2)
+
+        -- If `sq_dist` is nil, assume there were no safehouses found.
+        -- If we have safehouse distance disabled and are in the safehouse.
+        -- If safehouse distance enabled and we aren't in the safehouse or near it.
+        if sq_dist == nil
+        or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
+        or (sbvars.SafehouseDistance > 0 and
+            (in_safehouse_area == false or sq_dist > sbvars.SafehouseDistance)) then
+            text = text ..
+                " <LINE> <LINE> <RGB:1,0,0> " ..
+                getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants.MOD_ID))
+            not_available = true
+        end
+    end
+
+    -- Do admin override if enabled.
     if  not_available
     and player:getAccessLevel() == "Admin"
     and sbvars.DoAdminOverride then
