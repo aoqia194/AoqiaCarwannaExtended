@@ -3,7 +3,7 @@ Sandbox_EN = {
 
     Sandbox_AoqiaCarwannaExtended_AutoFormLootChance = "AutoForm Loot Chance",
     Sandbox_AoqiaCarwannaExtended_AutoFormLootChance_tooltip = "The chance of the AutoForm to be found in the world.",
-
+    
     Sandbox_AoqiaCarwannaExtended_DoAdminOverride = "Registration Admin Override",
     Sandbox_AoqiaCarwannaExtended_DoAdminOverride_tooltip = "Allows admins to register a vehicle ignoring the blacklist.",
 
@@ -11,7 +11,7 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot_tooltip = "Adds the Auto Form to the loot tables.",
 
     Sandbox_AoqiaCarwannaExtended_DoCanHotwire = "Allow Hotwired Vehicles",
-    Sandbox_AoqiaCarwannaExtended_DoCanHotwire_tooltip = "Allows players to convert hotwired vehicles into pinkslips.<LINE>NOTE: These vehicles will hotwired when claimed.",
+    Sandbox_AoqiaCarwannaExtended_DoCanHotwire_tooltip = "Allows players to convert hotwired vehicles into pinkslips.<LINE>NOTE: These vehicles will be hotwired when claimed.",
 
     Sandbox_AoqiaCarwannaExtended_DoClearInventory = "Clear Vehicle Inventory",
     Sandbox_AoqiaCarwannaExtended_DoClearInventory_tooltip = "Requires players to clear a vehicle's inventory before claiming it.<LINE>Whitelisted parts are excluded.<LINE><RGB:1,0,0>This mod does NOT save items in vehicles!",
@@ -21,6 +21,9 @@ Sandbox_EN = {
 
     Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts = "Ignore Hidden Parts",
     Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts_tooltip = "Ignores parts that are not displayed to the player.<LINE><RGB:1,0,0>This is NOT needed for Tsarlib but this can cause other issues.",
+
+    Sandbox_AoqiaCarwannaExtended_DoKeepForm = "Keep AutoForm",
+    Sandbox_AoqiaCarwannaExtended_DoKeepForm_tooltip = "Lets the player keep the AutoForm instead of removing it from their inventory when creating a pinkslip.",
 
     Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot = "Enable Pinkslip Loot",
     Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot_tooltip = "Adds the Pinkslip to the loot tables.",
@@ -36,6 +39,12 @@ Sandbox_EN = {
     
     Sandbox_AoqiaCarwannaExtended_DoRequiresKey = "Require Key",
     Sandbox_AoqiaCarwannaExtended_DoRequiresKey_tooltip = "Requires a player to have the vehicle key in order convert it into a pinkslip.",
+
+    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly = "Safehouse Only",
+    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly_tooltip = "Require a player to be in or near (see SafehouseDistance) a safehouse to be able to spawn a vehicle.",
+
+    Sandbox_AoqiaCarwannaExtended_SafehouseDistance = "Safehouse Distance",
+    Sandbox_AoqiaCarwannaExtended_SafehouseDistance_tooltip = "The minimum distance (in tiles) the player needs to be from their safehouse to be able to spawn a vehicle.",
 
     Sandbox_AoqiaCarwannaExtended_DoShowAllParts = "Show All Parts' Condition",
     Sandbox_AoqiaCarwannaExtended_DoShowAllParts_tooltip = "Shows the condition of the vehicle's parts on the pinkslip.<LINE><RGB:1,0,0>NOTE: This adds a lot of information to the tooltip for modded vehicles.",
@@ -66,12 +75,12 @@ Sandbox_EN = {
 
     /* ----------------------- Mod Support Sandbox Options ---------------------- */
 
-    Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn = "Udderly Vehicle Respawn Compatibility",
-    Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn_tooltip = "Respawns vehicles when they are converted to pinkslips using UdderlyVehicleRespawn.",
+    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental = "Experimental Color Mode Compatibility",
+    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental_tooltip = "This feature forces vanilla cars to spawn with the correct colors in multiplayer.<LINE><RGB:1,0,0>Only enable this if your vanilla cars aren't the correct color when they spawn in multiplayer.",
 
     Sandbox_AoqiaCarwannaExtended_DoCompatTsarMod = "Experimental TsarLib 2.0 Compatibility",
     Sandbox_AoqiaCarwannaExtended_DoCompatTsawMod_tooltip = "Provides support for TsarLib's vehicle modifications.",
-    
-    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental = "Experimental Color Mode Compatibility",
-    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental_tooltip = "This feature forces vanilla cars to spawn with the correct colors in multiplayer.<LINE><RGB:1,0,0>Only enable this if your vanilla cars aren't the correct color when they spawn in multiplayer.",
+
+    Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn = "Udderly Vehicle Respawn Compatibility",
+    Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn_tooltip = "Respawns vehicles when they are converted to pinkslips using UdderlyVehicleRespawn.",
 }
