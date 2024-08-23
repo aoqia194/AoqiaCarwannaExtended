@@ -3,7 +3,7 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local aoqia_math = require("AoqiaZomboidUtils/math")
+local aoqia_math = require("AoqiaZomboidUtilsShared/math")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- TIS globals.
@@ -136,7 +136,7 @@ function ISToolTipInv:render()
 
     local text = getText("IGUI_AoqiaCarwannaExtended_Tooltip",
         tostring(mdata.EngineQuality),
-        tostring(mdata.Broken),
+        tostring(mdata.PartsBroken),
         tostring(mdata.Skin),
         tostring(mdata.HasKey),
         tostring(mdata.Hotwire)
