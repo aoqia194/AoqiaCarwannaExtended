@@ -331,8 +331,13 @@ function commands.spawn_vehicle(player, args)
         vehicle:setHotwired(true)
     end
 
-    -- Give the player a key.
     if args.HasKey then
+        logger:debug("Setting keys in ignition to true.")
+        vehicle:setKeysInIgnition(true)
+    end
+
+    -- Give the player a key.
+    if args.MakeKey and args.HasKey == false then
         local new_key = vehicle:createVehicleKey()
         if new_key then
             if player then

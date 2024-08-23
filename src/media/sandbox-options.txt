@@ -133,7 +133,7 @@ option AoqiaCarwannaExtended.SafehouseDistance
 	type = integer,
 	default = 10,
 	min = 0,
-	max = 100,
+	max = 1000,
 
 	page = AoqiaCarwannaExtended,
 	translation = AoqiaCarwannaExtended_SafehouseDistance,

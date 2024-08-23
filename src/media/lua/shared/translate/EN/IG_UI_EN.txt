@@ -2,11 +2,12 @@ IGUI_EN =
 {
     IGUI_ItemCat_AoqiaCarwannaExtended = "Vehicle",
 
-    IGUI_AoqiaCarwannaExtended_AutoForm = "Auto Form",
+    IGUI_AoqiaCarwannaExtended_AutoForm = "Registration Form",
     IGUI_AoqiaCarwannaExtended_Pinkslip = "Pinkslip",
     IGUI_AoqiaCarwannaExtended_Confirm = "Convert %s into a pinkslip?",
     IGUI_AoqiaCarwannaExtended_ConfirmWarning = "THIS WILL WIPE THE INTERIOR OF THE VEHICLE!!!",
     
+    IGUI_AoqiaCarwannaExtended_Tooltip = "Create Pinkslip",
     IGUI_AoqiaCarwannaExtended_Tooltip_Vehicle = "Vehicle",
     IGUI_AoqiaCarwannaExtended_Tooltip_Skin = "Body Style",
     IGUI_AoqiaCarwannaExtended_Tooltip_Key = "Has Key",

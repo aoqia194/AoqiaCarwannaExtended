@@ -74,6 +74,7 @@ function create_pinkslip:perform()
     mdata.EngineLoudness = self.vehicle:getEngineLoudness()
     mdata.EnginePower = self.vehicle:getEnginePower()
     mdata.EngineQuality = self.vehicle:getEngineQuality()
+    mdata.HasKey = self.vehicle:isKeysInIgnition()
     mdata.HeadlightsActive = self.vehicle:getHeadlightsOn()
     mdata.Hotwire = self.vehicle:isHotwired()
     mdata.LockedDoor = self.vehicle:isAnyDoorLocked()
@@ -84,9 +85,9 @@ function create_pinkslip:perform()
     mdata.VehicleName = vehicle_name
 
     local key = player_inventory:haveThisKeyId(self.vehicle:getKeyId())
-    if key then
-        mdata.HasKey = true
-        key:getContainer():Remove(key)
+    if key and mdata.HasKey == false then
+        mdata.MakeKey = true
+        player_inventory:Remove(key)
     end
 
     local pdata = mdata.Parts
