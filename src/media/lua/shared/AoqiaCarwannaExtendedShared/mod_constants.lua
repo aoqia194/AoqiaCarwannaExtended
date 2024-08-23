@@ -9,7 +9,7 @@ local logger = require("AoqiaZomboidUtilsShared/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "0.0.2"
+mod_constants.MOD_VERSION = "0.0.3"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
@@ -46,6 +46,7 @@ mod_constants.PARTID_DUMMY = {}
 --- @field LockedDoor boolean
 --- @field LockedTrunk boolean
 --- @field LootChance integer
+--- @field MakeKey boolean
 --- @field OtherTank integer | int
 --- @field Parts { [string]: PartIdDummy }
 --- @field PartsBroken integer | int
