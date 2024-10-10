@@ -15,13 +15,13 @@ local logger = mod_constants.LOGGER
 -- ------------------------------- Entrypoint ------------------------------- --
 
 -- Don't load on the client (excluding singleplayer).
-if  constants.IS_CLIENT
-and constants.IS_SINGLEPLAYER == false then
+if constants.IS_CLIENT and constants.IS_SINGLEPLAYER == false then
     logger:debug("Prevented server entrypoint from being executed because that is bad.")
     return
 end
 
-if getActivatedMods():contains("CW") then
+local mods = getActivatedMods()
+if mods:contains("CW") then
     logger:error("The original CarWanna mod was found. To prevent collisions, this mod is disabled.")
     return
 end
