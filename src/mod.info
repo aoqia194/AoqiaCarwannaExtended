@@ -4,4 +4,5 @@ description=An extended version of the original Carwanna mod by Xyberviri.
 poster=poster.png
 require=AoqiaZomboidUtils
 versionMin=41.78.16
-modVersion=0.0.3
+modVersion=1.0.0
+url=https://github.com/aoqia194/AoqiaCarwannaExtended/
