@@ -1,19 +1,20 @@
-IGUI_EN =
-{
+IGUI_EN = {
     IGUI_ItemCat_AoqiaCarwannaExtended = "Vehicle",
-
     IGUI_AoqiaCarwannaExtended_AutoForm = "Registration Form",
     IGUI_AoqiaCarwannaExtended_Pinkslip = "Pinkslip",
-    IGUI_AoqiaCarwannaExtended_Confirm = "Convert %s into a pinkslip?",
-    IGUI_AoqiaCarwannaExtended_ConfirmWarning = "THIS WILL WIPE THE INTERIOR OF THE VEHICLE!!!",
-    
-    IGUI_AoqiaCarwannaExtended_Tooltip = "Create Pinkslip",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Vehicle = "Vehicle",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Skin = "Body Style",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Key = "Has Key",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Hotwired = "Hotwired",
-    IGUI_AoqiaCarwannaExtended_Tooltip_EngineQuality = "Engine Quality",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Missing = "Missing Parts",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Broken = "Broken Parts",
-    IGUI_AoqiaCarwannaExtended_Tooltip_Invalid = "THIS PINKSLIP IS INVALID!",
+
+    IGUI_AoqiaCarwannaExtended_ConfirmText = "Convert %1 into a Pinkslip?",
+
+    // IGUI_AoqiaCarwannaExtended_VehicleName = "Vehicle Name: %1",
+    IGUI_AoqiaCarwannaExtended_VehicleSkin = "Body Style: %1",
+    IGUI_AoqiaCarwannaExtended_HasKey = "Has Key: %1",
+    IGUI_AoqiaCarwannaExtended_Hotwired = "Hotwired: %1",
+    IGUI_AoqiaCarwannaExtended_PartsMissing = "Missing Parts: %1",
+    IGUI_AoqiaCarwannaExtended_PartsDamaged = "Damaged Parts: %1",
+    IGUI_AoqiaCarwannaExtended_InvalidItem = "THIS PINKSLIP IS INVALID!",
+
+    IGUI_AoqiaCarwannaExtended_HaloNote_NilVehicle = "The vehicle does not exist.",
+    IGUI_AoqiaCarwannaExtended_HaloNote_NoAutoForm = "You do not have a Registration Form.",
+    IGUI_AoqiaCarwannaExtended_HaloNote_VehicleIntersecting = "There is already a vehicle spawned there.",
+    IGUI_AoqiaCarwannaExtended_HaloNote_NoGeneratedPinkslips = "Generated pinkslips are disabled!",
 }
