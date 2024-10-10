@@ -1,18 +1,21 @@
 Tooltip_EN = {
-    Tooltip_AoqiaCarwannaExtended_Aegis = "Owned Vehicle",
-    Tooltip_AoqiaCarwannaExtended_Blacklisted = "Blacklisted",
-    Tooltip_AoqiaCarwannaExtended_ClaimOutside = "Can only be claimed on the ground outside.",
-    Tooltip_AoqiaCarwannaExtended_DoAdminOverride = "Admin Override",
+    Tooltip_AoqiaCarwannaExtended_DoAdminOverride = "Admin override is enabled!",
+    Tooltip_AoqiaCarwannaExtended_Blacklisted = "This vehicle is blacklisted!",
+    Tooltip_AoqiaCarwannaExtended_HasPassengers = "This vehicle has passengers!",
+    Tooltip_AoqiaCarwannaExtended_Hotwired = "This vehicle is hotwired.",
+
     Tooltip_AoqiaCarwannaExtended_DoSafehouseOnly = "Can only be claimed in or near a safehouse protected area.",
-    Tooltip_AoqiaCarwannaExtended_Fail = "Fail",
-    Tooltip_AoqiaCarwannaExtended_HasItems = "There are items in the vehicle parts listed below.",
-    Tooltip_AoqiaCarwannaExtended_HasKey = "Has Key",
-    Tooltip_AoqiaCarwannaExtended_Hotwired = "Hotwired",
-    Tooltip_AoqiaCarwannaExtended_Install = "Parts Missing",
-    Tooltip_AoqiaCarwannaExtended_Key = "Vehicle Key",
-    Tooltip_AoqiaCarwannaExtended_NeedsKey  = "Needs Key",
-    Tooltip_AoqiaCarwannaExtended_Pass = "Pass",
-    Tooltip_AoqiaCarwannaExtended_Passengers = "Occupied",
-    Tooltip_AoqiaCarwannaExtended_Repair = "Parts Damaged",
-    Tooltip_AoqiaCarwannaExtended_TrailerKey = "Not Needed",
+
+    Tooltip_AoqiaCarwannaExtended_HasItems = "There are items in these parts' containers:",
+    Tooltip_AoqiaCarwannaExtended_PartsMissing = "These parts are missing:",
+    Tooltip_AoqiaCarwannaExtended_PartsDamaged = "These parts are damaged:",
+    Tooltip_AoqiaCarwannaExtended_PartsMissingNum = "Missing Parts: %1",
+    Tooltip_AoqiaCarwannaExtended_PartsDamagedNum = "Damaged Parts: %1",
+
+    Tooltip_AoqiaCarwannaExtended_NeedsKey  = "The vehicle key is needed to register it!",
+    Tooltip_AoqiaCarwannaExtended_TrailerKey = "This is a trailer, so no vehicle key is needed.",
+
+    Tooltip_AoqiaCarwannaExtended_AutoForm = "Used to register a vehicle.",
+    Tooltip_AoqiaCarwannaExtended_Pinkslip = "Spawns the registered vehicle when used.",
+    Tooltip_AoqiaCarwannaExtended_PinkslipRandom = "Spawns a random vehicle when used.",
 }
