@@ -13,7 +13,8 @@ local logger = mod_constants.LOGGER
 
 -- ------------------------------- Entrypoint ------------------------------- --
 
-if getActivatedMods():contains("CW") then
+local activated_mods = getActivatedMods()
+if activated_mods:contains("CW") then
     logger:error("The original CarWanna mod was found. To prevent collisions, this mod is disabled.")
     return
 end
