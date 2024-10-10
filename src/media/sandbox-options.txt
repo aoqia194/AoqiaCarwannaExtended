@@ -83,6 +83,26 @@ option AoqiaCarwannaExtended.DoPinkslipLoot
 	translation = AoqiaCarwannaExtended_DoPinkslipLoot,
 }
 
+option AoqiaCarwannaExtended.DoDynamicPinkslipWeight
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoDynamicPinkslipWeight,
+}
+
+option AoqiaCarwannaExtended.PinkslipWeight
+{
+	type = double,
+	default = 1.0,
+	min = 0.0,
+	max = 100000.0,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_PinkslipWeight,
+}
+
 option AoqiaCarwannaExtended.DoRegistration
 {
 	type = boolean,
@@ -92,6 +112,15 @@ option AoqiaCarwannaExtended.DoRegistration
 	translation = AoqiaCarwannaExtended_DoRegistration,
 }
 
+option AoqiaCarwannaExtended.DoAllowGeneratedPinkslips
+{
+	type = boolean,
+	default = true,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoAllowGeneratedPinkslips,
+}
+
 option AoqiaCarwannaExtended.DoRequiresAllParts
 {
 	type = boolean,
@@ -99,6 +128,15 @@ option AoqiaCarwannaExtended.DoRequiresAllParts
 
 	page = AoqiaCarwannaExtended,
 	translation = AoqiaCarwannaExtended_DoRequiresAllParts,
+}
+
+option AoqiaCarwannaExtended.DoRequiresRepairedParts
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRequiresRepairedParts,
 }
 
 option AoqiaCarwannaExtended.DoRequiresForm
