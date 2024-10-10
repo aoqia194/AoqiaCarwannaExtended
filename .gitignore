@@ -1,8 +1,8 @@
 # Workshop distribution folder
-dist
+dist/
 
 # Workshop Dependencies
-libs
+lib/
 
 # Blender autosave file
 *.blend1
