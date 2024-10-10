@@ -1,16 +1,21 @@
--- -------------------------------------------------------------------------- --
---                          Vehicle UI tooltip stuff                          --
--- -------------------------------------------------------------------------- --
+-- -------------------------------------------- --
+-- CREATE PINKSLIP TIMED ACTION                 --
+-- -------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
+-- std globals.
+local setmetatable = setmetatable
+local table = table
 -- TIS globals.
 local getText = getText
 local ISBaseTimedAction = ISBaseTimedAction
 local Metabolics = Metabolics
 local SandboxVars = SandboxVars
 local sendClientCommand = sendClientCommand
+-- Mod globals
+local UdderlyVehicleRespawn = UdderlyVehicleRespawn
 
 local logger = mod_constants.LOGGER
 
@@ -44,6 +49,7 @@ function create_pinkslip:update()
     end
 end
 
+--- Create the pinkslip item after the action is completed.
 function create_pinkslip:perform()
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
 
@@ -53,16 +59,33 @@ function create_pinkslip:perform()
 
     local vehicle_script = self.vehicle:getScript()
     local vehicle_id = vehicle_script:getName()
-    local vehicle_name = getText("IGUI_VehicleName" .. vehicle_id) or "NULL_TRANSLATION"
+    local vehicle_name = getText("IGUI_VehicleName" .. vehicle_id) --[[@as string]]
 
     local player_inventory = self.character:getInventory()
-    local pinkslip = player_inventory:AddItem("AoqiaCarwannaExtended.Pinkslip")
-    pinkslip:setName("Pinkslip: " .. vehicle_name .. " (used)")
+    local pinkslip = player_inventory:AddItem(mod_constants.MOD_ID .. ".Pinkslip")
+    pinkslip:setName(("%s (%s)"):format(
+        getText("IGUI_AoqiaCarwannaExtended_Pinkslip"),
+        vehicle_name))
+    pinkslip:setTooltip(getText("Tooltip_AoqiaCarwannaExtended_Pinkslip"))
+
+    if sbvars.DoDynamicPinkslipWeight then
+        pinkslip:setWeight(self.vehicle:getWeight())
+    end
 
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
+
+    -- Replicate vehicle mod data to pinkslip mod data.
+    mdata.ModData = self.vehicle:getModData()
+
+    if mdata.Parts and mdata.Parts.index and mdata.Parts.values then
+        mdata.Parts = mdata.Parts
+    else
+        --- @diagnostic disable-next-line: assign-type-mismatch
+        mdata.Parts = { index = table.newarray(), values = table.newarray() }
+    end
+
     mdata.Blood = mdata.Blood or {}
     mdata.Color = mdata.Color or {}
-    mdata.Parts = mdata.Parts or {}
 
     mdata.Blood.F = self.vehicle:getBloodIntensity("Front")
     mdata.Blood.B = self.vehicle:getBloodIntensity("Rear")
@@ -76,13 +99,11 @@ function create_pinkslip:perform()
     mdata.EngineQuality = self.vehicle:getEngineQuality()
     mdata.HasKey = self.vehicle:isKeysInIgnition()
     mdata.HeadlightsActive = self.vehicle:getHeadlightsOn()
-    mdata.Hotwire = self.vehicle:isHotwired()
-    mdata.LockedDoor = self.vehicle:isAnyDoorLocked()
-    mdata.LockedTrunk = self.vehicle:isTrunkLocked()
+    mdata.Hotwired = self.vehicle:isHotwired()
     mdata.Skin = self.vehicle:getSkinIndex()
     mdata.Rust = self.vehicle:getRust()
-    mdata.VehicleId = vehicle_script:getFullName()
-    mdata.VehicleName = vehicle_name
+    mdata.Id = vehicle_script:getFullName()
+    mdata.Name = vehicle_name
 
     local key = player_inventory:haveThisKeyId(self.vehicle:getKeyId())
     if key and mdata.HasKey == false then
@@ -90,10 +111,12 @@ function create_pinkslip:perform()
         player_inventory:Remove(key)
     end
 
-    local pdata = mdata.Parts
+    local parts = mdata.Parts
+    -- Should never happen~
+    if parts == nil then return end
 
     local missing_parts = 0
-    local broken_parts = 0
+    local damaged_parts = 0
     for i = 1, self.vehicle:getPartCount() do
         -- Breaks are continue here!
         repeat
@@ -113,45 +136,62 @@ function create_pinkslip:perform()
             local item_condition = item:getCondition()
 
             if  sbvars.DoIgnoreHiddenParts
-            and part:getCategory() ~= "nodisplay"
-            and sbvars.DoCompatTsarMod
-            and ATA2TuningTable
-            and ATA2TuningTable[vehicle_id]
-            and ATA2TuningTable[vehicle_id].parts[part_id] then
+            and part:getCategory() == "nodisplay"
+            and (sbvars.DoCompatTsarMod == false
+                or ATA2TuningTable == false
+                or ATA2TuningTable[vehicle_id] == false
+                or ATA2TuningTable[vehicle_id].parts[part_id] == false) then
+                logger:debug("Part %s is nodisplay.", part_id)
                 break
             end
 
-            --- @diagnostic disable-next-line
-            pdata[part_id] = {}
-            local piddata = pdata[part_id]
+            -- Initialise the parts arrays
+            parts.index[i] = part_id
+            parts.values[i] = {} --- @diagnostic disable-line: missing-fields
 
-            -- If the part has mod data to sync.
-            local part_mdata = part:getModData()
-            if part_mdata then piddata.ModData = part_mdata end
+            local pdata = parts.values[i]
 
-            -- If the parts have items we can remove.
-            if item_type and item_type:isEmpty() == false then
-                piddata.Condition = part_condition
+            -- If the parts have no items to remove.
+            if item_type == nil or item_type:isEmpty() then
+                logger:debug("Item of part (%s) is empty.", part_id)
+
+                pdata.Condition = part_condition
                 if part_condition < 100 then
-                    broken_parts = broken_parts + 1
+                    logger:debug("Part (%s) is damaged.", part_id)
+                    damaged_parts = damaged_parts + 1
                 end
 
                 break
             end
 
-            piddata.Condition = item_condition
-            piddata.Item = item:getFullType()
+            -- If the part has mod data to sync.
+            local part_mdata = part:getModData()
+            if part_mdata and #part_mdata > 0 then
+                logger:debug("Part (%s) has mod data.", part_id)
+                pdata.ModData = part_mdata
+            end
+
+            logger:debug("Setting part (%s) condition to (%d).", part_id, item_condition)
+            pdata.Condition = item_condition
+            pdata.FullType = item:getFullType()
 
             -- The part holds fluids.
             if part:isContainer() and part:getItemContainer() == nil then
-                piddata.Content = part:getContainerContentAmount()
+                logger:debug("Setting part (%s) content to (%d).",
+                    part_id,
+                    part:getContainerContentAmount())
+                pdata.Content = part:getContainerContentAmount()
             end
 
             -- The part is a battery.
             if item:IsDrainable() then
-                piddata.Delta = item:getUsedDelta()
+                logger:debug("Setting part (%s) delta to (%d).",
+                    part_id,
+                    item:getUsedDelta())
+                pdata.Delta = item:getUsedDelta()
             end
 
+            -- NOTE: Not needed methinks because we sync mod data above.
             -- TsarLib mod support
             -- if  sbvars.DoCompatTsarMod
             -- and part_mdata.tuning2
@@ -161,19 +201,17 @@ function create_pinkslip:perform()
 
             -- Count broken parts
             if part_condition < 100 or item_condition < 100 then
-                broken_parts = broken_parts + 1
+                damaged_parts = damaged_parts + 1
             end
-
-            break
         until true
     end
 
-    mdata.PartsBroken = broken_parts
+    mdata.PartsDamaged = damaged_parts
     mdata.PartsMissing = missing_parts
 
     -- Remove form item if required.
-    if sbvars.DoRequiresForm and sbvars.DoKeepForm then
-        local form = player_inventory:getFirstTypeRecurse("AutoForm")
+    if sbvars.DoRequiresForm and sbvars.DoKeepForm == false then
+        local form = player_inventory:getFirstTypeRecurse(mod_constants.MOD_ID .. ".AutoForm")
         form:getContainer():Remove(form)
     end
 
