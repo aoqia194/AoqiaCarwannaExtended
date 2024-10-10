@@ -3,11 +3,9 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local aoqia_math = require("AoqiaZomboidUtilsShared/math")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals
-local pairs = pairs
 local tostring = tostring
 
 -- TIS globals.
@@ -17,7 +15,6 @@ local getMouseY = getMouseY
 local getText = getText
 local getTextManager = getTextManager
 local ISContextMenu = ISContextMenu
-local ISToolTipInv = ISToolTipInv
 local SandboxVars = SandboxVars
 
 local logger = mod_constants.LOGGER
@@ -25,6 +22,8 @@ local logger = mod_constants.LOGGER
 -- ------------------------------ Module Start ------------------------------ --
 
 local tooltip = {}
+
+tooltip.o_tooltip_render = nil
 
 -- Font stuff
 local font = getCore():getOptionTooltipFont()
@@ -42,13 +41,14 @@ end
 local core = getCore()
 local screen_width = core:getScreenWidth()
 local screen_height = core:getScreenHeight()
+local text_manager = getTextManager()
 
-local text_manager = nil
-
+--- A modified version of the original render function.
 --- @param self self
 --- @param hard_width? float
-function tooltip.render_override(self, hard_width)
-    if ISContextMenu.instance and ISContextMenu.instance.visibleCheck then
+function tooltip.modified_render(self, hard_width)
+    if  ISContextMenu.instance
+    and ISContextMenu.instance.visibleCheck then
         return
     end
 
@@ -56,13 +56,8 @@ function tooltip.render_override(self, hard_width)
     local my = getMouseY() + 24
 
     if self.followMouse == false then
-        mx = self:getX()
-        my = self:getY()
-
-        if self.anchorBottomLeft then
-            mx = self.anchorBottomLeft.x
-            my = self.anchorBottomLeft.y
-        end
+        mx = self.anchorBottomLeft and self.anchorBottomLeft.x or self:getX()
+        my = self.anchorBottomLeft and self.anchorBottomLeft.y or self:getY()
     end
 
     self.tooltip:setX(mx + 11)
@@ -75,15 +70,23 @@ function tooltip.render_override(self, hard_width)
     local tw = self.tooltip:getWidth()
     local th = self.tooltip:getHeight()
 
-    self.tooltip:setX(aoqia_math.max(0, aoqia_math.min(mx + 11, screen_width - tw - 1)))
-    if self.followMouse == false and self.anchorBottomLeft then
-        self.tooltip:setY(aoqia_math.max(0, aoqia_math.min(my - th, screen_height - th - 1)))
-    else
-        self.tooltip:setY(aoqia_math.max(0, aoqia_math.min(my, screen_height - th - 1)))
-    end
+    local v1 = mx + 11
+    local v2 = (screen_width - tw) - 1
+    local v3 = v1 < v2 and v1 or v2
+    local x = v3 > 0 and v3 or 0
 
-    self:setX(self.tooltip:getX() - 11)
-    self:setY(self.tooltip:getY())
+    v1 = (self.followMouse == false and self.anchorBottomLeft) and my - th or my
+    v2 = (screen_height - th) - 1
+    v3 = v1 < v2 and v1 or v2
+    local y = v3 > 0 and v3 or 0
+
+    self.tooltip:setX(x)
+    self.tooltip:setY(y)
+
+    logger:debug("w = %d, h = %d", tw, th)
+
+    self:setX(x - 11)
+    self:setY(y)
     self:setWidth(hard_width or (tw + 11))
     self:setHeight(th)
 
@@ -119,46 +122,64 @@ function tooltip.render_override(self, hard_width)
     self.item:DoTooltip(self.tooltip)
 end
 
-tooltip.o_render = ISToolTipInv.render
---- @diagnostic disable-next-line: duplicate-set-field
-function ISToolTipInv:render()
-    if ISContextMenu.instance and ISContextMenu.instance.visibleCheck then
+--- My hooked render function
+--- @param self ISToolTipInv
+function tooltip.render(self)
+    if tooltip.o_tooltip_render == nil or (ISContextMenu.instance
+        and ISContextMenu.instance.visibleCheck) then
         return
     end
 
+    --- @type InventoryItem
     local item = self.item
-    if item == nil or item:getType() ~= "AutoTitle" then
-        tooltip.o_render(self)
+    if item == nil or item:getFullType() ~= (mod_constants.MOD_ID .. "AutoForm") then
+        tooltip.o_tooltip_render(self)
         return
-    end
-
-    if text_manager == nil then
-        text_manager = getTextManager()
     end
 
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     local mdata = item:getModData() --[[@as ModDataDummy]]
 
-    local text = getText("IGUI_AoqiaCarwannaExtended_Tooltip") or "NULL_TRANSLATION"
+    local text = getText(("IGUI_%s_Tooltip"):format(mod_constants.MOD_ID)) --[[@as string]]
 
-    if sbvars.DoShowAllParts then
-        for part, data in pairs(mdata.Parts) do
-            text = ("%s%s %s"):format(text, getText("IGUI_VehiclePart" .. part),
-                tostring(data.Condition))
+    text = text
+        .. " <LINE> "
+        .. getText(("IGUI_%s_VehicleSkin"):format(mod_constants.MOD_ID), mdata.Skin)
+        .. " <LINE> "
+        .. getText(("IGUI_%s_HasKey"):format(mod_constants.MOD_ID), mdata.HasKey and "Yes" or "No")
+        .. " <LINE> "
+        .. getText(("IGUI_%s_Hotwired"):format(mod_constants.MOD_ID),
+            mdata.Hotwired and "Yes" or "No")
+
+    local parts = mdata.Parts
+    if sbvars.DoShowAllParts and parts then
+        for i = 1, #parts.index do
+            local part = parts.index[i]
+            local data = parts.values[i]
+
+            text = text
+                .. ("%s (%s)%% <LINE> "):format(
+                    getText("IGUI_VehiclePart" .. part),
+                    tostring(data.Condition))
         end
+    else
+        text = text
+            .. getText(("IGUI_%s_PartsMissing"):format(mod_constants.MOD_ID), mdata.PartsMissing)
+            .. getText(("IGUI_%s_PartsDamaged"):format(mod_constants.MOD_ID), mdata.PartsDamaged)
     end
 
-    local text_width = aoqia_math.max(
-        text_manager:MeasureStringX(font_type, item:getName()),
-        text_manager:MeasureStringX(font_type, text))
-    local text_height = text_manager:MeasureStringY(font_type, mdata.VehicleName)
+    local v1 = text_manager:MeasureStringX(font_type, item:getName())
+    local v2 = text_manager:MeasureStringX(font_type, text)
+    local text_width = v1 > v2 and v1 or v2
+
+    local text_height = text_manager:MeasureStringY(font_type, mdata.Name)
 
     if text then
         text_height = text_height + text_manager:MeasureStringY(font_type, text) + 8
     end
 
     local tooltip_width = text_width + font_bounds
-    tooltip.render_override(self, tooltip_width)
+    tooltip.modified_render(self, tooltip_width)
 
     local tooltip_height = self.tooltip:getHeight() - 1
     self:setX(self.tooltip:getX() - 11)
@@ -173,11 +194,14 @@ function ISToolTipInv:render()
     local col_background = self.backgroundColor
     local col_border = self.borderColor
 
+    v1 = col_background.a + 0.4
+    local alpha = v1 < 1 and v1 or 1
+
     self:drawRect(0,
         tooltip_height,
         tooltip_width,
         text_height + 8,
-        aoqia_math.min(1, col_background.a + 0.4),
+        alpha,
         col_background.r,
         col_background.g,
         col_background.b)
@@ -195,7 +219,7 @@ function ISToolTipInv:render()
     local col_font = { a = 1.0, r = 0.9, g = 0.9, b = 0.9 }
 
     local y = (y_offset + (15 - line_height) / 2)
-    self:drawText(mdata.VehicleName, x_offset, y, col_font.r, col_font.g, col_font.b,
+    self:drawText(mdata.Name, x_offset, y, col_font.r, col_font.g, col_font.b,
         col_font.a, font_type)
 
     if text then
