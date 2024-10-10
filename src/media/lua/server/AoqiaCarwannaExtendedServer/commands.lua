@@ -7,16 +7,15 @@ local aq_math = require("AoqiaZomboidUtilsShared/math")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals.
-local math = math
 local tostring = tostring
+
 -- TIS globals cache.
 local addVehicleDebug = addVehicleDebug
-local getCell = getCell
-local getScriptManager = getScriptManager
+local getText = getText
 local InventoryItemFactory = InventoryItemFactory
 local SandboxVars = SandboxVars
+local ScriptManager = ScriptManager.instance
 local VehicleUtils = VehicleUtils
-local ZombRand = ZombRand
 
 local logger = mod_constants.LOGGER
 
@@ -27,31 +26,43 @@ local commands = {}
 --- @param player IsoPlayer
 --- @param args ModDataDummy
 function commands.spawn_vehicle(player, args)
-    local script_manager = getScriptManager()
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
 
     local x = player:getX()
     local y = player:getY()
     local z = player:getZ()
+    local square = player:getSquare()
 
-    logger:info_server("Spawning vehicle (%s) at (%f, %f, %f) by (%s).",
-        tostring(args.VehicleId),
-        x,
-        y,
-        z,
-        player:getUsername())
+    logger:info_server("Spawning vehicle (%s) at (%f, %f, %f).", tostring(args.Id), x, y, z)
 
-    if  player:getAccessLevel() ~= "Admin"
-    and player:getInventory():containsTypeRecurse("AutoForm") == false then
-        logger:info_server("Failed to spawn vehicle as the player does not have an AutoForm.")
+    -- Check if vehicle exists
+    if ScriptManager:getVehicle(args.Id) == nil then
+        logger:info_server("Failed to spawn vehicle as the vehicle does not exist.")
+        player:setHaloNote(getText(
+            ("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)
+        ))
+
         return
     end
 
-    local cell = getCell()
-    local square = cell:getGridSquare(x, y, z)
+    -- Check if player has AutoForm
+    if  player:getAccessLevel() ~= "Admin"
+    and player:getInventory():containsTypeRecurse("AutoForm") == false then
+        logger:info_server("Failed to spawn vehicle as the player does not have an AutoForm.")
+        player:setHaloNote(getText(
+            ("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)
+        ))
+
+        return
+    end
+
+    -- Check if vehicle is already in that position.
     if square:isVehicleIntersecting() then
-        logger:info_server(
-            "Failed to spawn vehicle as there is already a vehicle spawned at that location.")
+        logger:info_server("Failed to spawn vehicle, there is already a vehicle spawned there.")
+        player:setHaloNote(getText(
+            ("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)
+        ))
+
         return
     end
 
@@ -63,20 +74,21 @@ function commands.spawn_vehicle(player, args)
         args.Skin = -1
     end
 
-    local exp_vehicle = nil
-    local exp_target = nil
+    local exp_vehicle = nil --- @type VehicleScript
+    local exp_target = nil  --- @type string
     if args.Color and sbvars.DoCompatColorExperimental then
-        exp_vehicle = script_manager:getVehicle(args.VehicleId)
-        exp_target = args.VehicleId:match("[^.]*.(.*)")
+        exp_vehicle = ScriptManager:getVehicle(args.Id)
+        exp_target = args.Id:match("[^.]*.(.*)")
 
         exp_vehicle:Load(exp_target,
             ("{ forcedColor = %f %f %f, }"):format(args.Color.H, args.Color.S, args.Color.V))
     end
 
-    local vehicle = addVehicleDebug(args.VehicleId, args.Dir, args.Skin, square)
+    local vehicle = addVehicleDebug(args.Id, args.Dir, args.Skin, square)
     local vehicle_id = vehicle:getId()
     logger:info_server("Vehicle created with name (%s) and ID (%s).",
-        tostring(vehicle:getScriptName()), tostring(vehicle_id))
+        vehicle:getScriptName(),
+        tostring(vehicle_id))
 
     if args.Color and sbvars.DoCompatColorExperimental == false then
         logger:debug_server("Setting vehicle colour to (%f, %f, %f).", args.Color.H, args.Color.S,
@@ -86,10 +98,11 @@ function commands.spawn_vehicle(player, args)
     end
 
     if exp_vehicle and exp_target then
+        logger:debug_server("Loading vehicle script (%s).", exp_target)
         exp_vehicle:Load(exp_target, "{ forcedColor = -1 -1 -1, }")
     end
 
-    if args.EngineQuality and args.EngineLoudness and args.EnginePower then
+    if args.EngineQuality or args.EngineLoudness or args.EnginePower then
         logger:debug_server("Setting engine to (%d, %d, %d)",
             args.EngineQuality,
             args.EngineLoudness,
@@ -98,30 +111,73 @@ function commands.spawn_vehicle(player, args)
         vehicle:transmitEngine()
     end
 
-    if args.Upgrade then
-        vehicle:repair()
+    if args.Hotwired then
+        logger:debug_server("Setting hotwired to true.")
+        vehicle:setHotwired(true)
     end
 
-    -- Fucking stupid part loop holy shit.
-    for i = 1, vehicle:getPartCount() do
+    if args.HasKey then
+        logger:debug_server("Setting keys in ignition to true.")
+        vehicle:setKeysInIgnition(true)
+    end
+
+    -- Give the player a key.
+    if args.MakeKey and args.HasKey == nil then
+        logger:debug_server("Attempting to give the player a key.")
+
+        local new_key = vehicle:createVehicleKey()
+        if new_key == nil then
+            logger:warn_server("Failed to create vehicle key.")
+        end
+
+        if player then
+            -- This might be bugging out. For some reason, it spawns the key in the player's grid square.
+            logger:debug_server("Giving the player a key.")
+            --- @diagnostic disable-next-line: redundant-parameter
+            player:sendObjectChange("addItem", { item = new_key })
+        else
+            logger:warn_server("Failed to give the player a key as they are nil!")
+            --- @diagnostic disable-next-line
+            square:AddWorldInventoryItem(new_key, x, y, z)
+        end
+    end
+
+    -- TODO: Don't run this for generated pinkslips.
+    local parts = args.Parts
+    if parts == nil then return end
+
+    -- Only player-created pinkslips have parts.
+    -- Also, this goes 1 -> part_count whereas the mod data stores part id as the part index.
+    -- So if we have only 1 part with part index 2, this will not work.
+    for i = 1, #parts.index do
+        local part_id = parts.index[i]
+
         repeat
             -- break is continue here!
 
-            local part = vehicle:getPartByIndex(i - 1)
+            local part = vehicle:getPartById(part_id)
             local part_cat = part:getCategory()
-            local part_id = part:getId()
             local part_type = part:getItemType()
 
-            -- Hidden parts in the mechanic overlay.
-            if part_cat == "nodisplay"
-            or (sbvars.DoIgnoreHiddenParts and part_cat == "nodisplay")
-            or (sbvars.DoCompatTsarMod and ATA2TuningTable and ATA2TuningTable[vehicle_id]) then
+            local part_mdata = part:getModData()
+
+            logger:debug_server("Looping through parts with part (%s).", part_id)
+
+            -- Check if it's a hidden part in the mechanic overlay.
+            -- NOTE: This check is complex and I dont fully understand it so it's possibly broken.
+            if  sbvars.DoIgnoreHiddenParts
+            and part_cat == "nodisplay"
+            and (sbvars.DoCompatTsarMod == false
+                or ATA2TuningTable == nil
+                or ATA2TuningTable[vehicle_id] == nil
+                or ATA2TuningTable[vehicle_id].parts[part_id] == nil) then
                 if sbvars.DoFixHiddenParts then
                     logger:debug_server("Fixing hidden part (%s).", part_id)
+
                     part:setCondition(100)
                     vehicle:transmitPartCondition(part)
                 else
-                    logger:debug_server("Ignoring part (%s) because nodisplay.", part_id)
+                    logger:debug_server("Ignoring hidden part (%s).", part_id)
                 end
 
                 break
@@ -129,13 +185,8 @@ function commands.spawn_vehicle(player, args)
 
             -- If it is a part that cannot be removed.
             if part_type == nil or part_type:isEmpty() then
-                if args.Condition then
-                    logger:debug_server("Setting condition to (%d).", args.Condition)
-
-                    part:setCondition(args.Condition)
-                    vehicle:transmitPartCondition(part)
-                elseif args.Parts and args.Parts[part_id] then
-                    local new_val = args.Parts[part_id].Condition
+                if parts and parts.values[i] then
+                    local new_val = parts.values[i].Condition
                     if new_val then
                         logger:debug_server("Setting part condition to (%d).", new_val)
 
@@ -144,6 +195,7 @@ function commands.spawn_vehicle(player, args)
                     end
                 end
 
+                logger:debug_server("The part is not removable.")
                 break
             end
 
@@ -151,71 +203,40 @@ function commands.spawn_vehicle(player, args)
             local part_container = part:getItemContainer()
             local part_door = part:getDoor()
 
-            if args.Parts == nil then
-                -- Process pre-created(?) pinkslips.
-                if part_item == nil then break end
+            logger:debug_server("Found part (%s) with item (%s).", part_id, part_item:getName())
 
-                -- Remove items from installed vehicle part if required.
-                if  part_container
-                and part_container:getItems():size() > 0
-                and args.Clear then
-                    logger:debug_server("Removing items from part container %s.", part_id)
-                    part_container:removeAllItems()
-                end
+            -- NOTE: Process pre-created pinkslips.
 
-                -- Repair parts if required.
-                if args.Condition then
-                    logger:debug_server("Repairing part %s.", part_id)
+            -- TODO: Restructure
+            -- if args.Parts == nil or (args.Parts.index and #args.Parts.index == 0) then
+            --     if part_item == nil then print("AoqiaCarwannaExtended part item was nil") break end
 
-                    part:setCondition(args.Condition)
-                    part_item:setCondition(args.Condition)
-                    vehicle:transmitPartCondition(part)
-                end
+            --     -- Remove items from installed vehicle part if required.
+            --     if  sbvars.DoClearInventory
+            --     and part_container
+            --     and part_container:getItems():size() > 0 then
+            --         logger:debug_server("Removing items from part container (%s).", part_id)
+            --         part_container:removeAllItems()
+            --     end
 
-                -- Repair door if required.
-                if part_door and part_door:isLockBroken() then
-                    logger:debug_server("Fixing door for part %s.", part_id)
+            --     -- Repair door if required.
+            --     if part_door and part_door:isLockBroken() then
+            --         logger:debug_server("Fixing door for part (%s).", part_id)
 
-                    part_door:setLockBroken(false)
-                    vehicle:transmitPartDoor(part)
-                end
+            --         part_door:setLockBroken(false)
+            --         vehicle:transmitPartDoor(part)
+            --     end
 
-                -- Set the charge on all battery-type items.
-                if  part_item:IsDrainable()
-                and args.Battery
-                and part_id:contains("Battery") then
-                    part_item:setUsedDelta(args.Battery)
-                end
+            --     vehicle:transmitPartModData(part)
+            --     break
+            -- end
 
-                if part:isContainer() and part_container == nil then
-                    local part_capacity = part:getContainerCapacity()
-                    local part_content = part:getContainerContentAmount()
-
-                    local wheel_idx = part:getWheelIndex()
-                    if part_id == "GasTank" and args.GasTank then
-                        logger:debug_server("Setting gas tank to %d.", args.GasTank)
-                        part:setContainerContentAmount(math.min(args.GasTank, part_capacity))
-                    elseif wheel_idx ~= -1 and args.TirePsi then
-                        logger:debug_server("Setting tire psi to %d.", args.TirePsi)
-                        part:setContainerContentAmount(math.min(args.TirePsi, part_capacity))
-                        vehicle:setTireInflation(wheel_idx, part_content / part_capacity)
-                    elseif args.OtherTank then
-                        logger:debug_server("Setting other tank to %d.", args.OtherTank)
-                        part:setContainerContentAmount(math.min(args.OtherTank, part_capacity))
-                    end
-                end
-
-                logger:debug_server("Transmitting part mod data.")
-                vehicle:transmitPartModData(part)
-                break
-            end
-
-            -- Process player-created pinkslips.
+            -- NOTE: Process player-created pinkslips.
 
             -- Remove part that doesn't exist on pinkslip.
-            local pdata = args.Parts[part_id]
+            local pdata = parts.values[i]
             if pdata == nil then
-                logger:debug_server("Removing part %s because it does not exist on the pinkslip.",
+                logger:debug_server("Removing part (%s) because it does not exist on the pinkslip.",
                     part_id)
 
                 -- TsarATA support
@@ -223,11 +244,10 @@ function commands.spawn_vehicle(player, args)
                 and ATA2TuningTable
                 and ATA2TuningTable[vehicle_id]
                 and ATA2TuningTable[vehicle_id].parts[part_id] then
-                    part:getModData().tuning2 = {}
+                    part_mdata.tuning2 = {}
                     ATATuning2Utils.ModelByItemName(vehicle, part)
                 end
 
-                -- NOTE: Is this even valid????
                 --- @diagnostic disable-next-line
                 part:setInventoryItem(nil)
 
@@ -236,6 +256,7 @@ function commands.spawn_vehicle(player, args)
                     VehicleUtils.callLua(tbl.complete, vehicle, part)
                 end
 
+                logger:debug_server("Transmitting uninstalled part item...")
                 vehicle:transmitPartItem(part)
                 break
             end
@@ -243,20 +264,20 @@ function commands.spawn_vehicle(player, args)
             -- If part not already installed
 
             local part_item_type = part_item:getFullType()
-            if part_item == nil or part_item_type ~= pdata.Item then
+            if part_item == nil or part_item_type ~= pdata.FullType then
                 logger:debug_server("Swapping parts (%s) and (%s).", tostring(part_item_type),
-                    tostring(pdata.Item))
+                    tostring(pdata.FullType))
 
                 --- @diagnostic disable-next-line
                 part:setInventoryItem(nil)
                 vehicle:transmitPartItem(part)
 
-                local item = InventoryItemFactory.CreateItem(pdata.Item)
+                local item = InventoryItemFactory.CreateItem(pdata.FullType)
                 part:setInventoryItem(item)
                 if sbvars.DoCompatTsarMod and pdata.Model then
                     logger:debug_server("Attempting to set Tsar model for part (%s).", part_item_type)
 
-                    part:getModData().tuning2.model = pdata.Model
+                    part_mdata.tuning2.model = pdata.Model
                     -- vehicle:transmitPartModData(part)
                     ATATuning2Utils.ModelByItemName(vehicle, part, part_item)
                 end
@@ -266,32 +287,49 @@ function commands.spawn_vehicle(player, args)
                     VehicleUtils.callLua(tbl.complete, vehicle, part)
                 end
 
+                logger:debug_server("Transmitting installed part item...")
                 vehicle:transmitPartItem(part)
             end
 
-            part:setCondition(pdata["Condition"])
+            -- Set part condition
+            logger:debug_server("Setting part condition to (%d).", pdata.Condition)
+            part:setCondition(pdata.Condition)
             vehicle:transmitPartCondition(part)
 
             -- Directly from original mod author: "fix this bullshit".
-            if part_door and part_door:isLockBroken() then
-                logger:debug_server("Fixing part door with part id (%s).", part_id)
+            -- If part is a door, fix the lock and set the door lock/door opened.
+            if part_door then
+                if pdata.Open and part_door:isOpen() == false then
+                    logger:debug_server("Opening part (%s) door.", part_id)
+                    part_door:setOpen(true)
+                end
 
-                part_door:setLockBroken(false)
+                if pdata.LockBroken and part_door:isLockBroken() == false then
+                    logger:debug_server("Fixing part (%s) door.", part_id)
+                    part_door:setLockBroken(true)
+                end
+
+                if pdata.Locked and part_door:isLocked() == false then
+                    logger:debug_server("Locking part (%s) door.", part_id)
+                    part_door:setLocked(true)
+                end
+
                 --- @diagnostic disable-next-line
                 vehicle:transmitPartDoor(part_door)
             end
 
             -- Parts that hold items usually spawn with stuff.
-            -- Thus, we need to clear the items.
-            if  part_container
-            and part_container:getItems():size() > 0
-            and args.Clear then
+            if  sbvars.DoClearInventory
+            and part_container
+            and part_container:getItems():size() > 0 then
+                logger:debug_server("Removing all items from part (%s).", part_id)
                 part_container:removeAllItems()
             end
 
             -- Parts can hold things like gas, fire, air(??????)
             local content = pdata.Content
             if content then
+                logger:debug_server("Setting part container (%s) content to (%d).", part_id, content)
                 part:setContainerContentAmount(content)
 
                 local wheel_idx = part:getWheelIndex()
@@ -301,52 +339,32 @@ function commands.spawn_vehicle(player, args)
                 end
             end
 
-            -- Author said batteries only use `delta`.
+            -- Author said batteries are the only parts that use `delta`.
             local delta = pdata.Delta
             if delta and part_item then
+                logger:debug_server("Setting part delta to (%f).", delta)
                 part_item:setUsedDelta(delta)
                 vehicle:transmitPartUsedDelta(part)
             end
 
             vehicle:transmitPartModData(part)
-
-            break
         until true
     end
 
     if args.Rust then
+        logger:debug_server("Setting rust to (%f).", args.Rust)
         vehicle:setRust(args.Rust)
         vehicle:transmitRust()
     end
 
     if args.Blood then
+        logger:debug_server("Setting blood to (%f, %f, %f, %f).",
+            args.Blood.F, args.Blood.B, args.Blood.L, args.Blood.R)
         -- NOTE: Original mod checks for 0 here. I think it's not necessary.
         vehicle:setBloodIntensity("Front", args.Blood.F)
         vehicle:setBloodIntensity("Rear", args.Blood.B)
         vehicle:setBloodIntensity("Left", args.Blood.L)
         vehicle:setBloodIntensity("Right", args.Blood.R)
-    end
-
-    if args.Hotwire then
-        vehicle:setHotwired(true)
-    end
-
-    if args.HasKey then
-        logger:debug("Setting keys in ignition to true.")
-        vehicle:setKeysInIgnition(true)
-    end
-
-    -- Give the player a key.
-    if args.MakeKey and args.HasKey == false then
-        local new_key = vehicle:createVehicleKey()
-        if new_key then
-            if player then
-                player.sendObjectChange("addItem", { item = new_key })
-                return
-            end
-
-            square:AddWorldInventoryItem(new_key:getType(), ZombRand(1, 5), ZombRand(1, 5), 0)
-        end
     end
 end
 
