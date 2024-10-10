@@ -3,6 +3,7 @@ module AoqiaCarwannaExtended {
         DisplayCategory = AoqiaCarwannaExtended,
         DisplayName = AutoForm,
         Icon = AutoForm,
+        Tooltip = Tooltip_AoqiaCarwannaExtended_AutoForm,
         Type = Normal,
         Weight = 0.1,
         WorldStaticModel = AutoForm,
@@ -13,13 +14,9 @@ module AoqiaCarwannaExtended {
         DisplayName = Pinkslip,
         Icon = Pinkslip,
         Tags = Pinkslip,
+        Tooltip = Tooltip_AoqiaCarwannaExtended_PinkslipRandom,
         Type = Normal,
         Weight = 0.1,
         WorldStaticModel = Pinkslip,
-
-        Condition = 100.0,
-        GasTank = 100.0,
-        HasKey = true,
-        VehicleId = Base.VanSpecial,
     }
 }
