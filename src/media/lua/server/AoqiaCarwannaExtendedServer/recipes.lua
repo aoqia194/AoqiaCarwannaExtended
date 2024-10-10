@@ -3,30 +3,40 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
+local blacklist = require("AoqiaCarwannaExtendedShared/blacklists")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
+-- std globals.
+local assert = assert
+
 -- TIS globals cache.
-local getCell = getCell
+local getAllVehicles = getAllVehicles
 local getScriptManager = getScriptManager
+local getSquare = getSquare
 local Recipe = Recipe
 local sendClientCommand = sendClientCommand
+local ZombRand = ZombRand
 
 local logger = mod_constants.LOGGER
 
 -- ------------------------------ Module Start ------------------------------ --
 
-local recipes = { can_perform = {}, on_create = {}, item_types = {} }
+local recipes = {}
+
+Recipe.GetItemTypes[mod_constants.MOD_ID] = {}
+Recipe.OnCanPerform[mod_constants.MOD_ID] = {}
+Recipe.OnCreate[mod_constants.MOD_ID] = {}
 
 --- @param script_items ArrayList<Item>
-function recipes.item_types.pinkslip(script_items)
+Recipe.GetItemTypes[mod_constants.MOD_ID].Pinkslip = function (script_items)
     local script_manager = getScriptManager()
     --- @diagnostic disable-next-line
     script_items:addAll(script_manager:getItemsTag("Pinkslip"))
 end
 
 --- @type Recipe_OnCanPerform
-function recipes.can_perform.claim_vehicle(recipe, character, item)
-    local square = getCell():getGridSquare(character:getX(), character:getY(), character:getZ())
+Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, character, item)
+    local square = getSquare(character:getX(), character:getY(), character:getZ())
 
     if  character:isOutside()
     and character:getZ() == 0
@@ -38,82 +48,101 @@ function recipes.can_perform.claim_vehicle(recipe, character, item)
 end
 
 --- @type Recipe_OnCreate
-function recipes.on_create.claim_vehicle(
+Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     sources,
     result,
     character,
     item,
     isPrimaryHandItem,
     isSecondaryHandItem)
-    --- @diagnostic disable-next-line
+    --- @cast character IsoPlayer
+
+    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
+
+    --- @diagnostic disable-next-line: undefined-field
     local pinkslip = sources:get(1 - 1) --[[@as InventoryItem]]
 
-    if character:isOutside() == false or character:getZ() > 0 then
-        character:Say("I think this will work better on the ground if I go outside...")
-        --- @diagnostic disable-next-line
-        character:getInventory():AddItem(pinkslip)
-        return
-    end
+    -- FIXME: Disabled for now because I think some buildings count as inside like garages.
+    -- if character:isOutside() == false or character:getZ() > 0 then
+    --     character:Say("I think this will work better on the ground if I go outside...")
+    --     --- @diagnostic disable-next-line
+    --     character:getInventory():AddItem(pinkslip)
+    --     return
+    -- end
 
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
+    local args = {} --[[@as ModDataDummy]] --- @diagnostic disable-line
 
-    -- The vehicle that is being requested by the player.
-    local args = { VehicleId = mdata.VehicleId }
-    if mdata.Parts then
-        -- Player-created pinkslip branch.
-        args.parts = mdata.Parts
+    -- If there are no parts, it means the pinkslip isn't player-made.
+    -- We have to handle it differently because it will not have stored any proper data for parts.
+    if mdata.Parts == nil then
+        if sbvars.DoAllowGeneratedPinkslips == false then
+            character:setHaloNote(
+                getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips")
+                    :format(mod_constants.MOD_ID)))
+
+            return
+        end
+
+        -- Get a random vehicle for the pinkslip that isn't blacklisted.
+        local vehicle_names = getAllVehicles()
+        local vehicle_name = nil
+
+        local count = 1
+        while true do
+            if count >= 60 then
+                logger:error("Unable to select random vehicle due to timeout.")
+                return
+            end
+
+            vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size() - 1)) --[[@as string]]
+            local name_lower = vehicle_name:lower()
+            logger:debug("Checking random vehicle (%s).", vehicle_name)
+
+            -- If vehicle not blacklisted, trailer, burnt, or smashed.
+            if  blacklist.vehicle_blacklist.index[vehicle_name] == nil
+            and name_lower:contains("trailer") == false
+            and name_lower:contains("burnt") == false
+            and name_lower:contains("smashed") == false then
+                logger:debug("Random vehicle selected.")
+                break
+            end
+
+            count = count + 1
+        end
+        assert(vehicle_name, "No vehicle found when trying to claim random vehicle from pinkslip.")
+
+        args.Id = vehicle_name
     else
-        -- Premade pinkslip branch.
-        if mdata.Battery then args.Battery = mdata.Battery end
-        if mdata.Condition then args.Condition = mdata.Condition end
-        if mdata.EngineLoudness then args.EngineLoudness = mdata.EngineLoudness end
-        if mdata.EnginePower then args.EnginePower = mdata.EnginePower end
-        if mdata.EngineQuality then args.EngineQuality = mdata.EngineQuality end
-        if mdata.GasTank then args.GasTank = mdata.GasTank end
-        if mdata.HasKey then args.HasKey = true end
-        if mdata.MakeKey then args.MakeKey = true end
-        if mdata.HeadlightsActive then args.HeadlightsActive = true end
-        if mdata.HeaterActive then args.HeaterActive = true end
-        if mdata.Hotwire then args.Hotwire = true end
-        if mdata.LockedDoor then args.LockedDoor = true end
-        if mdata.LockedTrunk then args.LockedTrunk = true end
-        if mdata.OtherTank then args.OtherTank = mdata.OtherTank or mdata.FuelTank end
-        if mdata.Rust then args.Rust = mdata.Rust end
-        if mdata.Skin then args.Skin = mdata.Skin end
-        if mdata.TirePsi then args.TirePsi = mdata.TirePsi end
-        if mdata.Upgrade then args.Upgrade = true end
+        args.Parts = mdata.Parts
+        args.Id = mdata.Id
     end
 
-    -- Transfer blood on partst.
+    if mdata.EngineLoudness then args.EngineLoudness = mdata.EngineLoudness end
+    if mdata.EnginePower then args.EnginePower = mdata.EnginePower end
+    if mdata.EngineQuality then args.EngineQuality = mdata.EngineQuality end
+    if mdata.HasKey then args.HasKey = true end
+    if mdata.MakeKey then args.MakeKey = true end
+    if mdata.HeadlightsActive then args.HeadlightsActive = true end
+    if mdata.HeaterActive then args.HeaterActive = true end
+    if mdata.Hotwired then args.Hotwired = true end
+    if mdata.Rust then args.Rust = mdata.Rust end
+    if mdata.Skin then args.Skin = mdata.Skin end
+
     if mdata.Blood then
-        args.Blood = args.Blood or {}
-        args.Blood.F = mdata.Blood.F
-        args.Blood.B = mdata.Blood.B
-        args.Blood.L = mdata.Blood.L
-        args.Blood.R = mdata.Blood.R
+        args.Blood = { F = mdata.Blood.F, B = mdata.Blood.B, L = mdata.Blood.L, R = mdata.Blood.R }
     end
 
-    -- Transfer colours.
     if mdata.Color then
-        args.Color = args.Color or {}
-        args.Color.H = mdata.Color.H
-        args.Color.S = mdata.Color.S
-        args.Color.V = mdata.Color.V
+        args.Color = { H = mdata.Color.H, S = mdata.Color.S, V = mdata.Color.V }
     end
 
     args.X = character:getX()
     args.Y = character:getY()
     args.Z = character:getZ()
-
     args.Dir = character:getDir()
-    args.Clear = true
 
     sendClientCommand(character, mod_constants.MOD_ID, "spawn_vehicle", args)
 end
-
--- Add all above to global namespace (required by recipes)
-Recipe.OnCanPerform[mod_constants.MOD_ID] = { ClaimVehicle = recipes.can_perform.claim_vehicle }
-Recipe.OnCreate[mod_constants.MOD_ID] = { ClaimVehicle = recipes.on_create.claim_vehicle }
-Recipe.GetItemTypes[mod_constants.MOD_ID] = { Pinkslip = recipes.item_types.pinkslip }
 
 return recipes
