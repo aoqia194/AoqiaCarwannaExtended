@@ -21,7 +21,7 @@ end
 
 function events.register()
     logger:debug("Registering events...")
-    
+
     Events.OnGameBoot.Add(events.game_boot)
 end
 
