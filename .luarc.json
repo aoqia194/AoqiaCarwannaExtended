@@ -4,17 +4,9 @@
         "requireSeparator": "/"
     },
     "diagnostics": {
-        "globals": [
-            // TsarLib Tuning thing.
-            "ATATuning2Utils",
-            "ATA2TuningTable",
-            // Udderly Vehicle Respawn.
-            "UdderlyVehicleRespawn",
-            // Valhalla = dead lul
-            "Valhalla"
-        ],
+        "globals": [],
         "ignoredFiles": "Opened",
-        "libraryFiles": "Opened",
+        "libraryFiles": "Disable",
         "neededFileStatus": {
             "codestyle-check": "Any"
         },
@@ -110,11 +102,14 @@
             "client/?.lua",
             "server/?.lua"
         ],
-        "version": "Lua 5.1"
+        "version": "Lua 5.1" // PZ uses a similar version to 5.1
     },
     "semantic": {
         "annotation": true,
         "enable": true,
+        // VSCode already does keyword highlighting but I
+        // turn this on and off every so often because
+        // sometimes vscode bugs out
         "keyword": false,
         "variable": true
     },
@@ -137,15 +132,15 @@
         "checkThirdParty": false,
         "ignoreDir": [
             ".vscode",
-            "libs/"
+            "lib/"
         ],
         "library": [
             "C:/Users/aoqia/AppData/Roaming/Code/User/globalStorage/sumneko.lua/addonManager/addons/umbrella/module/library",
             "C:/Program Files (x86)/Steam/steamapps/common/ProjectZomboid/media/lua",
-            "C:/github/AoqiaZomboidUtils/src/media/lua/shared",
-            "C:/github/AoqiaCarwannaExtended/libs"
+            "../AoqiaZomboidUtils/src/media/lua/shared",
+            "lib/"
         ],
         "maxPreload": 10000,
-        "preloadFileSize": 1000
+        "preloadFileSize": 10000
     }
 }
