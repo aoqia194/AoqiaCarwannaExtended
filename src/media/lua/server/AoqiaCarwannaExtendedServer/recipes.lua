@@ -62,14 +62,6 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     --- @diagnostic disable-next-line: undefined-field
     local pinkslip = sources:get(1 - 1) --[[@as InventoryItem]]
 
-    -- FIXME: Disabled for now because I think some buildings count as inside like garages.
-    -- if character:isOutside() == false or character:getZ() > 0 then
-    --     character:Say("I think this will work better on the ground if I go outside...")
-    --     --- @diagnostic disable-next-line
-    --     character:getInventory():AddItem(pinkslip)
-    --     return
-    -- end
-
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
     local args = {} --[[@as ModDataDummy]] --- @diagnostic disable-line
 
@@ -97,7 +89,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
 
             vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size() - 1)) --[[@as string]]
             local name_lower = vehicle_name:lower()
-            logger:debug("Checking random vehicle (%s).", vehicle_name)
+            logger:debug("Selecting random vehicle (%s).", vehicle_name)
 
             -- If vehicle not blacklisted, trailer, burnt, or smashed.
             if  blacklist.vehicle_blacklist.index[vehicle_name] == nil
@@ -117,6 +109,8 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         args.Parts = mdata.Parts
         args.Id = mdata.Id
     end
+
+    -- Set general vehicle properties.
 
     if mdata.EngineLoudness then args.EngineLoudness = mdata.EngineLoudness end
     if mdata.EnginePower then args.EnginePower = mdata.EnginePower end
