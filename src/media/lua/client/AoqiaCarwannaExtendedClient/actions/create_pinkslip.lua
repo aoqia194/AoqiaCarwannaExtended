@@ -81,7 +81,7 @@ function create_pinkslip:perform()
         mdata.Parts = mdata.Parts
     else
         --- @diagnostic disable-next-line: assign-type-mismatch
-        mdata.Parts = { index = table.newarray(), values = table.newarray() }
+        mdata.Parts = { index = {}, values = {} }
     end
 
     mdata.Blood = mdata.Blood or {}
@@ -117,6 +117,10 @@ function create_pinkslip:perform()
 
     local missing_parts = 0
     local damaged_parts = 0
+
+    -- FIXME: We loop over parts and store the ones that exist
+    -- but we have no way currently of storing what parts are missing.
+    local idx = 1
     for i = 1, self.vehicle:getPartCount() do
         -- Breaks are continue here!
         repeat
@@ -145,11 +149,10 @@ function create_pinkslip:perform()
                 break
             end
 
-            -- Initialise the parts arrays
-            parts.index[i] = part_id
-            parts.values[i] = {} --- @diagnostic disable-line: missing-fields
+            parts.index[idx] = i
+            parts.values[idx] = {} --- @diagnostic disable-line: missing-fields
 
-            local pdata = parts.values[i]
+            local pdata = parts.values[idx]
 
             -- If the parts have no items to remove.
             if item_type == nil or item_type:isEmpty() then
@@ -203,6 +206,9 @@ function create_pinkslip:perform()
             if part_condition < 100 or item_condition < 100 then
                 damaged_parts = damaged_parts + 1
             end
+
+            idx = idx + 1
+            break
         until true
     end
 
@@ -211,6 +217,8 @@ function create_pinkslip:perform()
 
     -- Remove form item if required.
     if sbvars.DoRequiresForm and sbvars.DoKeepForm == false then
+        logger:debug("Removing form from inventory...")
+
         local form = player_inventory:getFirstTypeRecurse(mod_constants.MOD_ID .. ".AutoForm")
         form:getContainer():Remove(form)
     end
