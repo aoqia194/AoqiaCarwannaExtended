@@ -97,6 +97,22 @@ function commands.spawn_vehicle(player, args)
         vehicle:transmitColorHSV()
     end
 
+    if args.Rust then
+        logger:debug_server("Setting rust to (%f).", args.Rust)
+        vehicle:setRust(args.Rust)
+        vehicle:transmitRust()
+    end
+
+    if args.Blood then
+        logger:debug_server("Setting blood to (%f, %f, %f, %f).",
+            args.Blood.F, args.Blood.B, args.Blood.L, args.Blood.R)
+        -- NOTE: Original mod checks for 0 here. I think it's not necessary.
+        vehicle:setBloodIntensity("Front", args.Blood.F)
+        vehicle:setBloodIntensity("Rear", args.Blood.B)
+        vehicle:setBloodIntensity("Left", args.Blood.L)
+        vehicle:setBloodIntensity("Right", args.Blood.R)
+    end
+
     if exp_vehicle and exp_target then
         logger:debug_server("Loading vehicle script (%s).", exp_target)
         exp_vehicle:Load(exp_target, "{ forcedColor = -1 -1 -1, }")
@@ -142,21 +158,38 @@ function commands.spawn_vehicle(player, args)
         end
     end
 
-    -- TODO: Don't run this for generated pinkslips.
+    -- Clear the vehicle inventory. For some reason, addVehicleDebug
+    -- populates the inventory of trunk and glovebox.
+    if sbvars.DoVehicleLoot == false then
+        local container_count = vehicle:getContainerCount()
+        for i = 1, container_count do
+            local cont = vehicle:getContainerByIndex(i - 1)
+            if cont and cont:isEmpty() == false then
+                logger:debug_server("Clearing container (%s) with type (%s).", i, cont:getType())
+                cont:clear()
+            end
+        end
+    end
+
     local parts = args.Parts
-    if parts == nil then return end
+    if parts == nil
+    or parts.index == nil
+    or parts.values == nil then
+        logger:debug_server("Parts data was nil.")
+        return
+    end
 
     -- Only player-created pinkslips have parts.
     -- Also, this goes 1 -> part_count whereas the mod data stores part id as the part index.
     -- So if we have only 1 part with part index 2, this will not work.
     for i = 1, #parts.index do
-        local part_id = parts.index[i]
-
         repeat
             -- break is continue here!
+            local idx = parts.index[i]
 
-            local part = vehicle:getPartById(part_id)
+            local part = vehicle:getPartByIndex(idx)
             local part_cat = part:getCategory()
+            local part_id = part:getId()
             local part_type = part:getItemType()
 
             local part_mdata = part:getModData()
@@ -201,40 +234,11 @@ function commands.spawn_vehicle(player, args)
 
             local part_item = part:getInventoryItem() --[[@as DrainableComboItem]]
             local part_container = part:getItemContainer()
-            local part_door = part:getDoor()
 
             logger:debug_server("Found part (%s) with item (%s).", part_id, part_item:getName())
 
-            -- NOTE: Process pre-created pinkslips.
-
-            -- TODO: Restructure
-            -- if args.Parts == nil or (args.Parts.index and #args.Parts.index == 0) then
-            --     if part_item == nil then print("AoqiaCarwannaExtended part item was nil") break end
-
-            --     -- Remove items from installed vehicle part if required.
-            --     if  sbvars.DoClearInventory
-            --     and part_container
-            --     and part_container:getItems():size() > 0 then
-            --         logger:debug_server("Removing items from part container (%s).", part_id)
-            --         part_container:removeAllItems()
-            --     end
-
-            --     -- Repair door if required.
-            --     if part_door and part_door:isLockBroken() then
-            --         logger:debug_server("Fixing door for part (%s).", part_id)
-
-            --         part_door:setLockBroken(false)
-            --         vehicle:transmitPartDoor(part)
-            --     end
-
-            --     vehicle:transmitPartModData(part)
-            --     break
-            -- end
-
-            -- NOTE: Process player-created pinkslips.
-
             -- Remove part that doesn't exist on pinkslip.
-            local pdata = parts.values[i]
+            local pdata = parts.values[i] --[[@as PartIdDummy]]
             if pdata == nil then
                 logger:debug_server("Removing part (%s) because it does not exist on the pinkslip.",
                     part_id)
@@ -261,10 +265,10 @@ function commands.spawn_vehicle(player, args)
                 break
             end
 
-            -- If part not already installed
+            -- If the part installed is not the expected part, uninstall it and install the expected part.
 
-            local part_item_type = part_item:getFullType()
-            if part_item == nil or part_item_type ~= pdata.FullType then
+            local part_item_type = part_item and part_item:getFullType() or nil
+            if part_item and part_item_type and part_item_type ~= pdata.FullType then
                 logger:debug_server("Swapping parts (%s) and (%s).", tostring(part_item_type),
                     tostring(pdata.FullType))
 
@@ -284,6 +288,7 @@ function commands.spawn_vehicle(player, args)
 
                 local tbl = part:getTable("install")
                 if tbl and tbl.complete then
+                    -- FIXME: This when called with radio part raises error.
                     VehicleUtils.callLua(tbl.complete, vehicle, part)
                 end
 
@@ -298,6 +303,7 @@ function commands.spawn_vehicle(player, args)
 
             -- Directly from original mod author: "fix this bullshit".
             -- If part is a door, fix the lock and set the door lock/door opened.
+            local part_door = part:getDoor()
             if part_door then
                 if pdata.Open and part_door:isOpen() == false then
                     logger:debug_server("Opening part (%s) door.", part_id)
@@ -314,8 +320,7 @@ function commands.spawn_vehicle(player, args)
                     part_door:setLocked(true)
                 end
 
-                --- @diagnostic disable-next-line
-                vehicle:transmitPartDoor(part_door)
+                vehicle:transmitPartDoor(part)
             end
 
             -- Parts that hold items usually spawn with stuff.
@@ -348,23 +353,9 @@ function commands.spawn_vehicle(player, args)
             end
 
             vehicle:transmitPartModData(part)
+
+            break
         until true
-    end
-
-    if args.Rust then
-        logger:debug_server("Setting rust to (%f).", args.Rust)
-        vehicle:setRust(args.Rust)
-        vehicle:transmitRust()
-    end
-
-    if args.Blood then
-        logger:debug_server("Setting blood to (%f, %f, %f, %f).",
-            args.Blood.F, args.Blood.B, args.Blood.L, args.Blood.R)
-        -- NOTE: Original mod checks for 0 here. I think it's not necessary.
-        vehicle:setBloodIntensity("Front", args.Blood.F)
-        vehicle:setBloodIntensity("Rear", args.Blood.B)
-        vehicle:setBloodIntensity("Left", args.Blood.L)
-        vehicle:setBloodIntensity("Right", args.Blood.R)
     end
 end
 
