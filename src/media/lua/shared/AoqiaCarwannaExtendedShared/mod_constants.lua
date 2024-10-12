@@ -9,7 +9,7 @@ local logger = require("AoqiaZomboidUtilsShared/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "1.0.0"
+mod_constants.MOD_VERSION = "0.1.0"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
@@ -31,8 +31,8 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field Temperature int The temperate for the Heater part.
 
 --- @class (exact) PartsDummy
---- @field index table<int, string> An array of part indexes.
---- @field values table<int, PartIdDummy> An array of part dummy data.
+--- @field index int[] An array of part indexes.
+--- @field values PartIdDummy[] An array of part dummy data.
 
 --- The Pinkslip item mod data struct.
 --- @class (exact) ModDataDummy
@@ -80,6 +80,7 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field DoSafehouseOnly boolean
 --- @field DoShowAllParts boolean
 --- @field DoZedLoot boolean
+--- @field DoVehicleLoot boolean
 --- @field MinimumCondition int
 --- @field PartWhitelist string
 --- @field PinkslipLootBlacklist string
