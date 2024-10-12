@@ -195,6 +195,15 @@ option AoqiaCarwannaExtended.DoZedLoot
 	translation = AoqiaCarwannaExtended_DoZedLoot,
 }
 
+option AoqiaCarwannaExtended.DoVehicleLoot
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoVehicleLoot,
+}
+
 option AoqiaCarwannaExtended.MinimumCondition
 {
 	type = integer,
