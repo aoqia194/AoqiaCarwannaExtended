@@ -60,11 +60,8 @@ function distributions.register_procedural(tbl)
             local item_name = item[1]
             local item_chance = item[2]
 
-            -- NOTE: I hate this.
             local cont = ProceduralDistributions.list[container]
-            if cont == nil then
-                cont = { items = {} }
-            end
+            cont = cont == nil and { items = {} } or cont
 
             local items = cont.items
             items[#items + 1] = (mod_constants.MOD_ID .. "." .. item_name)
