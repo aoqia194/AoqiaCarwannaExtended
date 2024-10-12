@@ -146,7 +146,6 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         local ktcolour = nil
         local endtext = nil
 
-        -- FIXME: I think there are cases where text is drawn when there is no cases met.
         if pinkslip.is_trailer(vehicle) then
             ktcolour = " <RGB:0,1,0> "
             endtext = getText(("Tooltip_%s_TrailerKey"):format(mod_constants.MOD_ID))
