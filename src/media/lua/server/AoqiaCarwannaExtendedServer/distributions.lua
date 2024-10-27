@@ -126,7 +126,7 @@ function distributions.init()
 
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
 
-    if sbvars.DoAutoFormLoot and sbvars.DoRequiresForm then
+    if sbvars.DoAutoFormLoot and sbvars.DoRequiresAutoForm then
         distributions.add_autoform()
     end
 
