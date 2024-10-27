@@ -3,6 +3,7 @@
 -- -------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
+local aoqia_table = require("AoqiaZomboidUtilsShared/table")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals.
@@ -75,7 +76,18 @@ function create_pinkslip:perform()
     local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
 
     -- Replicate vehicle mod data to pinkslip mod data.
-    mdata.ModData = self.vehicle:getModData()
+    local veh_mdata = self.vehicle:getModData()
+
+    local has_mdata = false
+    for _, _ in pairs(veh_mdata) do
+        has_mdata = true
+        break
+    end
+
+    if veh_mdata and has_mdata then
+        logger:debug("Vehicle has mod data, replicating it to pinkslip.")
+        mdata.ModData = aoqia_table.shallow_copy(veh_mdata)
+    end
 
     if mdata.Parts and mdata.Parts.index and mdata.Parts.values then
         mdata.Parts = mdata.Parts
@@ -102,8 +114,9 @@ function create_pinkslip:perform()
     mdata.Hotwired = self.vehicle:isHotwired()
     mdata.Skin = self.vehicle:getSkinIndex()
     mdata.Rust = self.vehicle:getRust()
-    mdata.Id = vehicle_script:getFullName()
+    mdata.FullType = vehicle_script:getFullName()
     mdata.Name = vehicle_name
+    mdata.Weight = self.vehicle:getWeight()
 
     local key = player_inventory:haveThisKeyId(self.vehicle:getKeyId())
     if key and mdata.HasKey == false then
@@ -127,88 +140,107 @@ function create_pinkslip:perform()
             local part = self.vehicle:getPartByIndex(i - 1)
             local part_id = part:getId()
             local part_condition = part:getCondition()
+            local part_item = part:getInventoryItem() --[[@as DrainableComboItem | nil]]
 
-            local item = part:getInventoryItem() --[[@as DrainableComboItem | nil]]
-            if item == nil then
-                logger:debug("Item of part %s does not exist or is missing.", part_id)
+            -- Construct initial part table.
+            parts.index[idx] = i - 1
+            parts.values[idx] = {} --- @diagnostic disable-line: missing-fields
+
+            logger:debug("Setting part (%s) condition to (%d).", part_id, part_condition)
+            local pdata = parts.values[idx]
+            pdata.Condition = part_condition
+            pdata.Type = part_id
+
+            -- If the part has no item, it means it cannot be uninstalled.
+            -- In this case, we mark it as missing an item.
+            if part_item == nil then
+                logger:debug("Part (%s) item does not exist or is missing.", part_id)
+                pdata.MissingItem = true
+
                 missing_parts = missing_parts + 1
-
+                idx = idx + 1
                 break
             end
 
-            local item_type = part:getItemType()
-            local item_condition = item:getCondition()
-
+            -- Check if the part is hidden in the mechanic overlay and mark it as nodisplay.
             if  sbvars.DoIgnoreHiddenParts
             and part:getCategory() == "nodisplay"
             and (sbvars.DoCompatTsarMod == false
                 or ATA2TuningTable == false
                 or ATA2TuningTable[vehicle_id] == false
                 or ATA2TuningTable[vehicle_id].parts[part_id] == false) then
-                logger:debug("Part %s is nodisplay.", part_id)
+                logger:debug("Part (%s) is nodisplay.", part_id)
+
+                pdata.NoDisplay = true
+                idx = idx + 1
                 break
             end
 
-            parts.index[idx] = i
-            parts.values[idx] = {} --- @diagnostic disable-line: missing-fields
+            -- TODO: Find out what this does!
+            local item_types = part:getItemType()
+            if item_types == nil or item_types:isEmpty() then
+                logger:debug("Part (%s) type is empty.", part_id)
 
-            local pdata = parts.values[idx]
-
-            -- If the parts have no items to remove.
-            if item_type == nil or item_type:isEmpty() then
-                logger:debug("Item of part (%s) is empty.", part_id)
-
-                pdata.Condition = part_condition
                 if part_condition < 100 then
                     logger:debug("Part (%s) is damaged.", part_id)
                     damaged_parts = damaged_parts + 1
                 end
 
+                idx = idx + 1
                 break
             end
 
-            -- If the part has mod data to sync.
+            -- Set the part item type to use.
+            local item_type = part_item:getFullType()
+            logger:debug("Setting part (%s) item type to (%s).", part_id, item_type)
+            pdata.ItemFullType = item_type
+
+            -- Set the part item's weight.
+            local item_weight = part_item:getWeight()
+            logger:debug("Setting part (%s) item weight to (%f).", part_id, item_weight)
+            pdata.ItemWeight = item_weight
+
+            -- Sync the part's mod data.
             local part_mdata = part:getModData()
-            if part_mdata and #part_mdata > 0 then
+            if part:hasModData() and part_mdata then
                 logger:debug("Part (%s) has mod data.", part_id)
-                pdata.ModData = part_mdata
+                pdata.ModData = aoqia_table.shallow_copy(part_mdata)
             end
 
-            logger:debug("Setting part (%s) condition to (%d).", part_id, item_condition)
-            pdata.Condition = item_condition
-            pdata.FullType = item:getFullType()
-
-            -- The part holds fluids.
+            -- If the part holds fluids, set the container content.
             if part:isContainer() and part:getItemContainer() == nil then
+                local amount = part:getContainerContentAmount()
+
                 logger:debug("Setting part (%s) content to (%d).",
                     part_id,
-                    part:getContainerContentAmount())
-                pdata.Content = part:getContainerContentAmount()
+                    amount)
+                pdata.Content = amount
             end
 
-            -- The part is a battery.
-            if item:IsDrainable() then
+            -- The part is a battery, set the delta.
+            if part_item:IsDrainable() then
+                local delta = part_item:getUsedDelta()
+
                 logger:debug("Setting part (%s) delta to (%d).",
                     part_id,
-                    item:getUsedDelta())
-                pdata.Delta = item:getUsedDelta()
+                    delta)
+                pdata.Delta = delta
             end
 
-            -- NOTE: Not needed methinks because we sync mod data above.
+            -- TODO: Not needed methinks because we sync mod data above.
             -- TsarLib mod support
             -- if  sbvars.DoCompatTsarMod
             -- and part_mdata.tuning2
             -- and part_mdata.tuning2.model then
-            --     piddata.Model = part_mdata.tuning2.model
+            --     pdata.Model = part_mdata.tuning2.model
             -- end
 
             -- Count broken parts
-            if part_condition < 100 or item_condition < 100 then
+            if part_condition < 100 or part_item:getCondition() < 100 then
                 damaged_parts = damaged_parts + 1
             end
 
             idx = idx + 1
-            break
         until true
     end
 
@@ -216,7 +248,7 @@ function create_pinkslip:perform()
     mdata.PartsMissing = missing_parts
 
     -- Remove form item if required.
-    if sbvars.DoRequiresForm and sbvars.DoKeepForm == false then
+    if sbvars.DoRequiresAutoForm and sbvars.DoKeepAutoForm == false then
         logger:debug("Removing form from inventory...")
 
         local form = player_inventory:getFirstTypeRecurse(mod_constants.MOD_ID .. ".AutoForm")
