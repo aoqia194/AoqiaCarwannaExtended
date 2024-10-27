@@ -1,11 +1,5 @@
 # Credits
 
-These credits are transferred from the original Carwanna mod.
-
-### Contributors
-- Noir#5285
-- Chuckleberry Finn
-
 ### 3rd Party Assets
 - The following sounds are used under the Mixkit Sound Effects Free License
 mixkit-fast-signing-with-a-pen-2370

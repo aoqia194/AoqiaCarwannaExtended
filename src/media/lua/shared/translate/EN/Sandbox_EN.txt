@@ -1,86 +1,120 @@
 Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended = "AoqiaCarwannaExtended",
 
-    Sandbox_AoqiaCarwannaExtended_AutoFormLootChance = "AutoForm Loot Chance",
-    Sandbox_AoqiaCarwannaExtended_AutoFormLootChance_tooltip = "The chance of the AutoForm to be found in the world.",
-    
-    Sandbox_AoqiaCarwannaExtended_DoAdminOverride = "Registration Admin Override",
-    Sandbox_AoqiaCarwannaExtended_DoAdminOverride_tooltip = "Allows admins to register a vehicle ignoring the blacklist.",
-
-    Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot = "Enable AutoForm Loot",
-    Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot_tooltip = "Adds the Auto Form to the loot tables.",
-
-    Sandbox_AoqiaCarwannaExtended_DoCanHotwire = "Allow Hotwired Vehicles",
-    Sandbox_AoqiaCarwannaExtended_DoCanHotwire_tooltip = "Allows players to convert hotwired vehicles into pinkslips.<LINE>NOTE: These vehicles will be hotwired when claimed.",
-
-    Sandbox_AoqiaCarwannaExtended_DoClearInventory = "Clear Vehicle Inventory",
-    Sandbox_AoqiaCarwannaExtended_DoClearInventory_tooltip = "Requires players to clear a vehicle's inventory before claiming it.<LINE>Whitelisted parts are excluded.<LINE><RGB:1,0,0>This mod does NOT save items in vehicles!",
-
-    Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts = "Fix Hidden Parts",
-    Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts_tooltip = "Repairs parts that are not displayed to the player.<LINE>This will fix issues with vehicles spawning in at less than 100% overall condition but has potential to cause some unintended side effects.",
-
-    Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts = "Ignore Hidden Parts",
-    Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts_tooltip = "Ignores parts that are not displayed to the player.<LINE><RGB:1,0,0>This is NOT needed for Tsarlib but this can cause other issues.",
-
-    Sandbox_AoqiaCarwannaExtended_DoKeepForm = "Keep AutoForm",
-    Sandbox_AoqiaCarwannaExtended_DoKeepForm_tooltip = "Lets the player keep the AutoForm instead of removing it from their inventory when creating a pinkslip.",
-
-    Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot = "Enable Pinkslip Loot",
-    Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot_tooltip = "Adds the Pinkslip to the loot tables.",
+    /* Global Toggles ------------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorGlobalToggles = "-------- Global Toggles --------",
 
     Sandbox_AoqiaCarwannaExtended_DoRegistration = "Enable Vehicle Registration",
     Sandbox_AoqiaCarwannaExtended_DoRegistration_tooltip = "Allows players to turn vehicles into pinkslips.",
 
-    Sandbox_AoqiaCarwannaExtended_DoRequiresAllParts = "Require All Parts",
-    Sandbox_AoqiaCarwannaExtended_DoRequiresAllParts_tooltip = "Requires vehicles to have all parts attached for players to register vehicles.<LINE><RGB:1,0,0>This might prevent some modded vehicles from being converted.<LINE>Whitelisted parts are excluded.",
+    Sandbox_AoqiaCarwannaExtended_DoAdminOverride = "Registration Admin Override",
+    Sandbox_AoqiaCarwannaExtended_DoAdminOverride_tooltip = "Allows admins to register a vehicle ignoring the blacklist.",
 
-    Sandbox_AoqiaCarwannaExtended_DoRequiresForm = "Require AutoForm",
-    Sandbox_AoqiaCarwannaExtended_DoRequiresForm_tooltip = "Requires an Auto Form to convert vehicles to pinkslips.",
-    
-    Sandbox_AoqiaCarwannaExtended_DoRequiresKey = "Require Key",
-    Sandbox_AoqiaCarwannaExtended_DoRequiresKey_tooltip = "Requires a player to have the vehicle key in order convert it into a pinkslip.",
+    /* Auto Form ---------------------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorAutoForm = "-------- Auto Form --------",
 
-    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly = "Safehouse Only",
-    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly_tooltip = "Require a player to be in or near (see SafehouseDistance) a safehouse to be able to spawn a vehicle.",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresAutoForm = "Require AutoForm",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresAutoForm_tooltip = "Requires an AutoForm to convert vehicles to pinkslips.",
 
-    Sandbox_AoqiaCarwannaExtended_SafehouseDistance = "Safehouse Distance",
-    Sandbox_AoqiaCarwannaExtended_SafehouseDistance_tooltip = "The minimum distance (in tiles) the player needs to be from their safehouse to be able to spawn a vehicle.",
+    Sandbox_AoqiaCarwannaExtended_DoKeepAutoForm = "Keep AutoForm",
+    Sandbox_AoqiaCarwannaExtended_DoKeepAutoForm_tooltip = "Lets the player keep the AutoForm instead of removing it from their inventory when creating a pinkslip.",
 
-    Sandbox_AoqiaCarwannaExtended_DoShowAllParts = "Show All Parts' Condition",
-    Sandbox_AoqiaCarwannaExtended_DoShowAllParts_tooltip = "Shows the condition of the vehicle's parts on the pinkslip.<LINE><RGB:1,0,0>NOTE: This adds a lot of information to the tooltip for modded vehicles.",
+    Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot = "Enable AutoForm Loot",
+    Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot_tooltip = "Adds the Auto Form to the loot tables.",
 
-    Sandbox_AoqiaCarwannaExtended_DoZedLoot = "Enable Zombie Loot",
-    Sandbox_AoqiaCarwannaExtended_DoZedLoot_tooltip = "Allows pinkslips to be found on zombies.",
+    Sandbox_AoqiaCarwannaExtended_AutoFormLootChance = "AutoForm Loot Chance",
+    Sandbox_AoqiaCarwannaExtended_AutoFormLootChance_tooltip = "The chance of the AutoForm to be found in the world.",
 
-    Sandbox_AoqiaCarwannaExtended_MinimumCondition = "Minimum Part Condition",
-    Sandbox_AoqiaCarwannaExtended_MinimumCondition_tooltip = "Sets the minimum condition that all existing parts must be to convert a vehicle to a pinkslip.",
-    
-    Sandbox_AoqiaCarwannaExtended_PartWhitelist = "Part Whitelist",
-    Sandbox_AoqiaCarwannaExtended_PartWhitelist_tooltip = "A list of parts to remove the requirement from, to be repaired or installed to convert a vehicle to a pinkslip.<LINE>Example: GasTank;Heater;GloveBox",
+    /* Pinkslip ------------------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorPinkslip = "-------- Pinkslip --------",
 
-    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist = "Pinkslip Blacklist",
-    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist_tooltip = "A list of Pinkslip items that should never spawn.<LINE>Example: PinkSlip.Van;PinkSlip.SUV",
+    Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot = "Enable Pinkslip Loot",
+    Sandbox_AoqiaCarwannaExtended_DoPinkslipLoot_tooltip = "Adds the Pinkslip to the loot tables.",
 
     Sandbox_AoqiaCarwannaExtended_PinkslipLootChance = "Pinkslip Loot Chance",
     Sandbox_AoqiaCarwannaExtended_PinkslipLootChance_tooltip = "The chance of the pinkslip to be found in containers.",
 
+    Sandbox_AoqiaCarwannaExtended_DoDynamicPinkslipWeight = "Enable Dynamic Pinkslip Weight",
+    Sandbox_AoqiaCarwannaExtended_DoDynamicPinkslipWeight_tooltip = "Makes pinkslips weigh the same amount as the vehicle it is encapsulating.",
+
+    Sandbox_AoqiaCarwannaExtended_PinkslipWeight = "Pinkslip Weight",
+    Sandbox_AoqiaCarwannaExtended_PinkslipWeight_tooltip = "If Dynamic Pinkslip Weight is disabled, it will use this weight.",
+
+    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist = "Pinkslip Blacklist",
+    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist_tooltip = "A list of generated pinkslip vehicles that should never spawn naturally. <LINE> Example: Base.Van;Base.SUV",
+
+    /* Main Vehicle Stuff --------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorMainVehicleStuff = "-------- Main Vehicle Stuff --------",
+
+    Sandbox_AoqiaCarwannaExtended_DoVehicleLoot = "Enable Vehicle Loot",
+    Sandbox_AoqiaCarwannaExtended_DoVehicleLoot_tooltip = "Allows player-claimed vehicles to populate the containers with loot.",
+
+    Sandbox_AoqiaCarwannaExtended_DoCanHotwire = "Allow Hotwired Vehicles",
+    Sandbox_AoqiaCarwannaExtended_DoCanHotwire_tooltip = "Allows players to convert hotwired vehicles into pinkslips. <LINE> NOTE: These vehicles will be hotwired when claimed.",
+
+    Sandbox_AoqiaCarwannaExtended_DoClearInventory = "Clear Vehicle Inventory",
+    Sandbox_AoqiaCarwannaExtended_DoClearInventory_tooltip = "Requires players to clear a vehicle's inventory before claiming it. <LINE> Whitelisted parts are excluded. <LINE> <RGB:1,0,0> This mod does NOT save items in vehicles!",
+
+    Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts = "Fix Hidden Parts",
+    Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts_tooltip = "Repairs parts that are not displayed to the player. <LINE> This will fix issues with vehicles spawning in at less than 100% overall condition. <LINE> <RGB:1,0,0> It has potential to cause some unintended side effects.",
+
+    Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts = "Ignore Hidden Parts",
+    Sandbox_AoqiaCarwannaExtended_DoIgnoreHiddenParts_tooltip = "Ignores parts that are not displayed to the player. <LINE> <RGB:1,0,0> This can cause other issues.",
+
+    Sandbox_AoqiaCarwannaExtended_DoAllowGeneratedPinkslips = "Allow Generated Pinkslips",
+    Sandbox_AoqiaCarwannaExtended_DoAllowGeneratedPinkslips_tooltip = "Allows players to claim world-generated pinkslips. <LINE> See (Enable Pinkslip Loot) to completely disable it.",
+
+    Sandbox_AoqiaCarwannaExtended_DoRequiresAllParts = "Require All Parts",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresAllParts_tooltip = "Requires vehicles to have all parts installed for players to register vehicles. <LINE> <RGB:1,0,0> This might prevent some modded vehicles from being converted. Whitelisted parts are excluded.",
+
+    Sandbox_AoqiaCarwannaExtended_DoRequiresRepairedParts = "Require Repaired Parts",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresRepairedParts_tooltip = "Requires all of the parts in a vehicle to be repaired before converting.",
+
+    Sandbox_AoqiaCarwannaExtended_MinimumCondition = "Minimum Part Condition",
+    Sandbox_AoqiaCarwannaExtended_MinimumCondition_tooltip = "Sets the minimum condition that all existing parts must be to convert a vehicle to a pinkslip.",
+    
+    Sandbox_AoqiaCarwannaExtended_DoRequiresKey = "Require Key",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresKey_tooltip = "Requires a player to have the vehicle key in order convert it into a pinkslip.",
+
+    Sandbox_AoqiaCarwannaExtended_DoShowAllParts = "Show All Parts' Condition",
+    Sandbox_AoqiaCarwannaExtended_DoShowAllParts_tooltip = "Shows the condition of the vehicle's parts on the pinkslip. <LINE> <RGB:1,1,0> This adds a lot of information to the tooltip for modded vehicles.",
+
+    Sandbox_AoqiaCarwannaExtended_PartWhitelist = "Part Whitelist",
+    Sandbox_AoqiaCarwannaExtended_PartWhitelist_tooltip = "A list of parts that remove the need to be repaired or installed. <LINE> Example: GasTank;Heater;GloveBox",
+
     Sandbox_AoqiaCarwannaExtended_TrailerBlacklist = "Trailer Blacklist",
-    Sandbox_AoqiaCarwannaExtended_TrailerBlacklist_tooltip = "A list of 'vehicles' that are treated like trailers; these do not require a key to convert.",
+    Sandbox_AoqiaCarwannaExtended_TrailerBlacklist_tooltip = "A list of 'vehicles' that are treated like trailers, these do not require a key to convert.",
 
     Sandbox_AoqiaCarwannaExtended_VehicleBlacklist = "Vehicle Blacklist",
-    Sandbox_AoqiaCarwannaExtended_VehicleBlacklist_tooltip = "A list of vehicle IDs that can not be converted to pinkslips.<LINE>Example: Base.Van;Base.CarLights",
+    Sandbox_AoqiaCarwannaExtended_VehicleBlacklist_tooltip = "A list of vehicle IDs that can not be converted to pinkslips. <LINE> Example: Base.Van;Base.CarLights",
+
+    /* Safehouse ------------------------------ */
+    Sandbox_AoqiaCarwannaExtended_SeparatorSafehouse = "-------- Safehouse --------",
+
+    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly = "Safehouse Only",
+    Sandbox_AoqiaCarwannaExtended_DoSafehouseOnly_tooltip = "Require a player to be in or near (see SafehouseDistance) a safehouse to be able to spawn a vehicle. <LINE> Ignored in singleplayer.",
+
+    Sandbox_AoqiaCarwannaExtended_SafehouseDistance = "Safehouse Distance",
+    Sandbox_AoqiaCarwannaExtended_SafehouseDistance_tooltip = "The minimum distance (in tiles) the player needs to be from their safehouse to be able to spawn a vehicle.",
+
+    /* Zombie Loot ---------------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorZombieLoot = "-------- Zombie Loot --------",
+
+    Sandbox_AoqiaCarwannaExtended_DoZedLoot = "Enable Zombie Loot",
+    Sandbox_AoqiaCarwannaExtended_DoZedLoot_tooltip = "Allows pinkslips to be found on zombies.",
 
     Sandbox_AoqiaCarwannaExtended_ZedLootChance = "Zombie Loot Chance",
     Sandbox_AoqiaCarwannaExtended_ZedLootChance_tooltip = "The chance of the pinkslip to be found on mechanic zombies.",
 
-    /* ----------------------- Mod Support Sandbox Options ---------------------- */
+    /* Mod Support Sandbox Options ------------ */
+    Sandbox_AoqiaCarwannaExtended_SeparatorModSupport = "-------- Mod Support --------",
 
-    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental = "Experimental Color Mode Compatibility",
-    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental_tooltip = "This feature forces vanilla cars to spawn with the correct colors in multiplayer.<LINE><RGB:1,0,0>Only enable this if your vanilla cars aren't the correct color when they spawn in multiplayer.",
-
-    Sandbox_AoqiaCarwannaExtended_DoCompatTsarMod = "Experimental TsarLib 2.0 Compatibility",
-    Sandbox_AoqiaCarwannaExtended_DoCompatTsawMod_tooltip = "Provides support for TsarLib's vehicle modifications.",
+    Sandbox_AoqiaCarwannaExtended_DoCompatTsarMod = "TsarLib 2.0 Compatibility",
+    Sandbox_AoqiaCarwannaExtended_DoCompatTsawMod_tooltip = "Provides experimental support for TsarLib's vehicle modifications.",
 
     Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn = "Udderly Vehicle Respawn Compatibility",
     Sandbox_AoqiaCarwannaExtended_DoCompatUdderlyRespawn_tooltip = "Respawns vehicles when they are converted to pinkslips using UdderlyVehicleRespawn.",
+
+    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental = "Experimental Color Mode Compatibility",
+    Sandbox_AoqiaCarwannaExtended_DoCompatColorExperimental_tooltip = "This feature forces vanilla cars to spawn with the correct colors in multiplayer. <LINE> <RGB:1,0,0> Only enable this if your vanilla cars aren't the correct color when they spawn in multiplayer.",
 }

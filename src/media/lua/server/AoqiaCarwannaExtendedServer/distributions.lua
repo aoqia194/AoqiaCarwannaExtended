@@ -3,11 +3,8 @@
 -- -------------------------------------------------------------------------- --
 
 -- This mod requires
-local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
--- STDLIB globals cache.
-local table = table
 -- TIS globals cache.
 local ProceduralDistributions = ProceduralDistributions
 local SandboxVars = SandboxVars
@@ -32,13 +29,22 @@ distributions.DistributionsTableDummy = {}
 distributions.ProcListDummy = {}
 
 --- Registers a table of suburb locations into the loot table.
---- @param tbl { [string]: string[] }
+--- @param tbl table<string, table<int, string>>
 --- @param proclist ProcListDummy
 function distributions.register_suburbs(tbl, proclist)
-    for location, containers in pairs(tbl) do
-        for i = 1, #containers do
-            local container = containers[i]
-            table.insert(SuburbsDistributions[location][container].procList, proclist)
+    for i = 1, #tbl[1] do
+        local location = tbl[1][i]
+
+        for j = 1, #tbl[2] do
+            local container = tbl[2][j]
+
+            local dist_cont = SuburbsDistributions[location][container]
+            if dist_cont == nil then
+                dist_cont = { procList = {}, procedural = true }
+            end
+
+            local list = dist_cont.procList
+            list[#list + 1] = proclist
         end
     end
 end
@@ -49,12 +55,17 @@ function distributions.register_procedural(tbl)
     for i = 1, #tbl.containers do
         local container = tbl.containers[i]
 
-        for k, v in pairs(tbl.items) do
-            if k == "item" then
-                v = (mod_constants.MOD_ID .. v)
-            end
+        for j = 1, #tbl.items do
+            local item = tbl.items[j]
+            local item_name = item[1]
+            local item_chance = item[2]
 
-            table.insert(ProceduralDistributions.list[container].items, v)
+            local cont = ProceduralDistributions.list[container]
+            cont = cont == nil and { items = {} } or cont
+
+            local items = cont.items
+            items[#items + 1] = (mod_constants.MOD_ID .. "." .. item_name)
+            items[#items + 1] = item_chance
         end
     end
 end
@@ -66,24 +77,10 @@ function distributions.add_autoform()
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
 
     local tbl = {
-        containers = { "OfficeDesk", "PoliceDesk" },
-        items = { { ["item"] = "AutoForm", ["chance"] = sbvars.FormLootChance } },
+        containers = { "OfficeDesk", "PoliceDesk", "Pinkslips" },
+        items = { { mod_constants.MOD_ID .. ".AutoForm", sbvars.AutoFormLootChance } },
     }
-    distributions.register_procedural(tbl)
-end
 
---- Adds the PinkSlip item to the loot table inside a vehicle.
---- @param item_name string
---- @param chance float
-function distributions.add_pinkslip_vehicle(item_name, chance)
-    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
-
-    if sbvars.DoFormLoot == false then return end
-
-    local tbl = {
-        containers = { "pinkslips" },
-        items = { { ["item"] = item_name, ["chance"] = chance } },
-    }
     distributions.register_procedural(tbl)
 end
 
@@ -91,11 +88,13 @@ end
 --- @param item_name string
 function distributions.add_pinkslip_zombie(item_name)
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
-
     if sbvars.DoZedLoot == false then return end
 
-    table.insert(SuburbsDistributions.all.Outfit_Mechanic.items, item_name)
-    table.insert(SuburbsDistributions.all.Outfit_Mechanic.items, sbvars.ZedLootChance)
+    --- @diagnostic disable: assign-type-mismatch
+    local items = SuburbsDistributions.all.Outfit_Mechanic.items
+    items[#items + 1] = item_name
+    items[#items + 1] = sbvars.ZedLootChance
+    --- @diagnostic enable: assign-type-mismatch
 end
 
 --- Adds the PinkSlip item to the SuburbsDistributions.
@@ -104,19 +103,39 @@ function distributions.add_pinkslip()
 
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     local dummy = { rolls = 1, items = {}, junk = { rolls = 1, items = {} } }
-    
+
     if sbvars.DoZedLoot then
         SuburbsDistributions.all.Outfit_Mechanic = SuburbsDistributions.all.Outfit_Mechanic or dummy
     end
 
-    -- TODO: I think this isn't the way to do it. Maybe do it like add_pinkslip_zombie.
-    local proclist = { name = "pinkslips", min = 0, max = 1, weightChance = sbvars.LootChance }
+    local proclist = { name = "pinkslips", min = 0, max = 1, weightChance = sbvars.PinkslipLootChance }
     local tbl = {
-        mechanic = { "crate", "metal_shelves" },
-        pawnshop = { "counter", "displaycase" },
-        policestorage = { "counter", "crate", "locker", "metal_shelves" },
+        { "mechanic", "pawnshop", "policestorage" },
+        {
+            { "crate",   "metal_shelves" },
+            { "counter", "displaycase" },
+            { "counter", "crate",        "locker", "metal_shelves" },
+        },
     }
+
     distributions.register_suburbs(tbl, proclist)
+end
+
+function distributions.init()
+    logger:debug_server("Parsing distributions...")
+
+    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
+
+    if sbvars.DoAutoFormLoot and sbvars.DoRequiresAutoForm then
+        distributions.add_autoform()
+    end
+
+    if sbvars.DoPinkslipLoot or sbvars.DoZedLoot then
+        distributions.add_pinkslip()
+    end
+
+    logger:debug_server("Finished parsing distributions. Reparsing loot tables...")
+    ItemPickerJava.Parse()
 end
 
 return distributions

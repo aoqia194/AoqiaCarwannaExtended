@@ -9,7 +9,7 @@ local logger = require("AoqiaZomboidUtilsShared/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "0.0.3"
+mod_constants.MOD_VERSION = "0.1.0"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
@@ -18,104 +18,90 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 -- ---------------------------- Class Definitions --------------------------- --
 
 --- @class (exact) PartIdDummy
---- @field Condition integer | int
---- @field Content float
---- @field Delta float
---- @field Item string
---- @field ModData table<any, any>
---- @field Model unknown
-mod_constants.PARTID_DUMMY = {}
+--- @field Condition int | nil The part's condition. Most parts have this.
+--- @field Content float | nil The part container's content amount, like GasTank.
+--- @field Delta float | nil The delta for parts like Battery that have % remaining delta.
+--- @field EngineLoudnessMultiplier int | nil The muffler's loudness multiplier.
+--- @field ItemFullType string | nil The Module.Name string of the part item.
+--- @field ItemWeight float The weight of the part item.
+--- @field LockBroken boolean | nil If the part can and should have its lock broken.
+--- @field Locked boolean | nil If the part can and should be locked.
+--- @field MissingItem boolean | nil If the part item is missing.
+--- @field ModData table<any, any> | nil The part's mod data table to be replicated.
+--- @field Model unknown | nil Some scuffed TsarMod stuff that I don't know about.
+--- @field NoDisplay boolean | nil If the part is marked as nodisplay.
+--- @field Open boolean | nil If the part can and should be opened.
+--- @field Temperature int | nil The temperate for the Heater part.
+--- @field Type string | nil The Name string of the part.
 
+--- @class (exact) PartsDummy
+--- @field index int[] | nil An array of part indexes.
+--- @field values PartIdDummy[] | nil An array of part data.
+
+--- The Pinkslip item mod data struct.
 --- @class (exact) ModDataDummy
---- @field Battery integer | int
---- @field Blood { F: float, B: float, L: float, R: float}
---- @field Clear unknown
---- @field Color { H: float, S: float, V: float}
---- @field Condition integer | int
---- @field Dir IsoDirections
---- @field EngineLoudness integer | int
---- @field EnginePower integer | int
---- @field EngineQuality integer | int
---- @field FuelTank integer | int
---- @field GasTank integer | int
---- @field HasKey boolean
---- @field HeadlightsActive boolean
---- @field HeaterActive boolean
---- @field Hotwire boolean
---- @field IsBlacklisted boolean
---- @field LockedDoor boolean
---- @field LockedTrunk boolean
---- @field LootChance integer
---- @field MakeKey boolean
---- @field OtherTank integer | int
---- @field Parts { [string]: PartIdDummy }
---- @field PartsBroken integer | int
---- @field PartsMissing integer | int
+--- @field Blood { F: float, B: float, L: float, R: float }
+--- @field Color { H: float, S: float, V: float }
+--- @field Dir IsoDirections The direction the vehicle is facing.
+--- @field EngineLoudness int
+--- @field EnginePower int
+--- @field EngineQuality int
+--- @field HasKey boolean | nil If true, there is a key in the ignition.
+--- @field HeadlightsActive boolean | nil
+--- @field HeaterActive boolean | nil
+--- @field Hotwired boolean | nil
+--- @field FullType string The Module.Name string of the vehicle.
+--- @field MakeKey boolean | nil If true, make a key for the player when claiming.
+--- @field ModData table<any, any> | nil Mod data table to be replicated to the vehicle object when spawned.
+--- @field Name string | nil The legible name of the vehicle.
+--- @field Parts PartsDummy | nil
+--- @field PartsDamaged int
+--- @field PartsMissing int
+--- @field PinkslipWeight float | nil The dynamic weight of the pinkslip item.
 --- @field Rust float
---- @field Skin integer | int
---- @field TirePsi integer
---- @field Upgrade boolean
---- @field VehicleId string
---- @field VehicleName string
-mod_constants.MOD_DATA_DUMMY = {}
+--- @field Skin int
+--- @field Weight float The weight of the vehicle.
 
+--- The SandboxVars mod data struct.
 --- @class (exact) SandboxVarsDummy
+--- Global Toggles
+--- @field DoRegistration boolean
 --- @field DoAdminOverride boolean
+--- Auto Form
+--- @field DoRequiresAutoForm boolean
+--- @field DoKeepAutoForm boolean
+--- @field DoAutoFormLoot boolean
+--- @field AutoFormLootChance float
+--- Pinkslip
+--- @field DoPinkslipLoot boolean
+--- @field PinkslipLootChance float
+--- @field DoDynamicPinkslipWeight boolean
+--- @field PinkslipWeight float
+--- @field PinkslipLootBlacklist string
+--- Main Vehicle Stuff
+--- @field DoVehicleLoot boolean
 --- @field DoCanHotwire boolean
 --- @field DoClearInventory boolean
 --- @field DoFixHiddenParts boolean
---- @field DoFormLoot boolean
 --- @field DoIgnoreHiddenParts boolean
---- @field DoKeepForm boolean
---- @field DoLootTables boolean
---- @field DoRegistration boolean
+--- @field DoAllowGeneratedPinkslips boolean
 --- @field DoRequiresAllParts boolean
---- @field DoRequiresForm boolean
+--- @field DoRequiresRepairedParts boolean
+--- @field MinimumCondition int
 --- @field DoRequiresKey boolean
---- @field DoSafehouseOnly boolean
 --- @field DoShowAllParts boolean
---- @field DoZedLoot boolean
---- @field FormLootChance float
---- @field LootBlacklist string
---- @field LootChance float
---- @field MinimumCondition integer
 --- @field PartWhitelist string
---- @field SafehouseDistance integer | int
 --- @field TrailerBlacklist string
 --- @field VehicleBlacklist string
+--- Safehouse
+--- @field DoSafehouseOnly boolean
+--- @field SafehouseDistance int
+--- Zombie Loot
+--- @field DoZedLoot boolean
 --- @field ZedLootChance float
---- @field DoCompatColorExperimental boolean
+--- Mod Compatibility
 --- @field DoCompatTsarMod boolean
 --- @field DoCompatUdderlyRespawn boolean
-mod_constants.SANDBOX_VARS_DUMMY = {
-    DoAdminOverride = false,
-    DoCanHotwire = true,
-    DoClearInventory = true,
-    DoFixHiddenParts = false,
-    DoFormLoot = true,
-    DoIgnoreHiddenParts = true,
-    DoKeepForm = false,
-    DoLootTables = true,
-    DoRegistration = true,
-    DoRequiresAllParts = true,
-    DoRequiresForm = true,
-    DoRequiresKey = true,
-    DoSafehouseOnly = false,
-    DoShowAllParts = false,
-    DoZedLoot = true,
-    FormLootChance = 1.0,
-    LootBlacklist = "",
-    LootChance = 1.0,
-    MinimumCondition = 100,
-    PartWhitelist = "",
-    SafehouseDistance = 10,
-    TrailerBlacklist = "",
-    VehicleBlacklist = "",
-    ZedLootChance = 0.01,
-    -- Mod Compatibility :D
-    DoCompatColorExperimental = false,
-    DoCompatTsarMod = false,
-    DoCompatUdderlyRespawn = false,
-}
+--- @field DoCompatColorExperimental boolean
 
 return mod_constants
