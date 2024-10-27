@@ -17,4 +17,6 @@ IGUI_EN = {
     IGUI_AoqiaCarwannaExtended_HaloNote_NoAutoForm = "You do not have a Registration Form.",
     IGUI_AoqiaCarwannaExtended_HaloNote_VehicleIntersecting = "There is already a vehicle spawned there.",
     IGUI_AoqiaCarwannaExtended_HaloNote_NoGeneratedPinkslips = "Generated pinkslips are disabled!",
+    IGUI_AoqiaCarwannaExtended_HaloNote_NotInSafehouse = "You are not in or near a safehouse!",
+    IGUI_AoqiaCarwannaExtended_HaloNote_NotOutside = "You need to be outside to claim a vehicle!",
 }
