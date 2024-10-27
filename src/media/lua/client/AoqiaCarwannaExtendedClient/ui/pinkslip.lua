@@ -4,6 +4,7 @@
 
 -- My requires.
 local blacklists = require("AoqiaCarwannaExtendedShared/blacklists")
+local constants = require("AoqiaZomboidUtilsShared/constants")
 local create_pinkslip = require("AoqiaCarwannaExtendedClient/actions/create_pinkslip")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 -- TIS requires.
@@ -65,7 +66,8 @@ end
 function pinkslip.confirm_dialog(player, vehicle)
     local player_num = player:getPlayerNum()
 
-    local confirm_text = getText(("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
+    local confirm_text = getText(
+        ("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
         getText("IGUI_VehicleName" .. vehicle:getScript():getName()))
     local modal = ISModalRichText:new(
         0,
@@ -105,7 +107,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         return
     end
 
-    if  sbvars.DoRequiresForm
+    if  sbvars.DoRequiresAutoForm
     and player_inv:containsTypeRecurse(mod_constants.MOD_ID .. ".AutoForm") == false then
         return
     end
@@ -148,10 +150,12 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
 
         if pinkslip.is_trailer(vehicle) then
             ktcolour = " <RGB:0,1,0> "
-            endtext = getText(("Tooltip_%s_TrailerKey"):format(mod_constants.MOD_ID))
+            endtext = getText(("Tooltip_%s_TrailerKey"):format(mod_constants
+                .MOD_ID))
         elseif sbvars.DoRequiresKey then
             ktcolour = " <RGB:1,0,0> "
-            endtext = getText(("Tooltip_%s_NeedsKey"):format(mod_constants.MOD_ID))
+            endtext = getText(("Tooltip_%s_NeedsKey"):format(mod_constants
+                .MOD_ID))
             not_available = true
 
             logger:debug("adding option failed: Needs key.")
@@ -177,9 +181,12 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         logger:debug("Is hotwired!")
     end
 
-    local container_items = table.newarray()
-    local damaged_parts = table.newarray()
-    local missing_parts = table.newarray()
+    --- @type string[]
+    local container_items = {}
+    --- @type string[]
+    local damaged_parts = {}
+    --- @type string[]
+    local missing_parts = {}
 
     -- Ah shit, here we go again.
     for i = 1, vehicle:getPartCount() do
@@ -230,20 +237,26 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         if sbvars.DoShowAllParts then
             text = text
                 .. " <LINE> <LINE> "
-                .. getText(("Tooltip_%s_PartsMissing"):format(mod_constants.MOD_ID))
+                .. getText(("Tooltip_%s_PartsMissing")
+                    :format(mod_constants.MOD_ID))
                 .. col
 
             for i = 1, #missing_parts do
                 local part = missing_parts[i]
+
+                local trans_key = "IGUI_VehiclePart" .. part
+                local trans_val = getText(trans_key)
                 text = text
                     .. " <LINE> "
-                    .. getText("IGUI_VehiclePart" .. part)
+                    .. (trans_val == trans_key
+                        and "[Hidden] " .. part or trans_val)
             end
         else
             text = text
                 .. " <LINE> "
                 .. col
-                .. getText(("Tooltip_%s_PartsMissingNum"):format(mod_constants.MOD_ID),
+                .. getText(
+                    ("Tooltip_%s_PartsMissingNum"):format(mod_constants.MOD_ID),
                     #missing_parts)
         end
 
@@ -259,21 +272,27 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         if sbvars.DoShowAllParts then
             text = text
                 .. " <LINE> <LINE> <RGB:1,1,1> "
-                .. getText(("Tooltip_%s_PartsDamaged"):format(mod_constants.MOD_ID),
+                .. getText(
+                    ("Tooltip_%s_PartsDamaged"):format(mod_constants.MOD_ID),
                     sbvars.MinimumCondition)
                 .. col
             for i = 1, #damaged_parts do
                 local part = damaged_parts[i]
+
+                local trans_key = "IGUI_VehiclePart" .. part
+                local trans_val = getText(trans_key)
                 text = text
                     .. " <LINE> "
                     .. col
-                    .. getText("IGUI_VehiclePart" .. part)
+                    .. (trans_val == trans_key
+                        and "[Hidden] " .. part or trans_val)
             end
         else
             text = text
                 .. " <LINE> "
                 .. col
-                .. getText(("Tooltip_%s_PartsDamagedNum"):format(mod_constants.MOD_ID),
+                .. getText(
+                    ("Tooltip_%s_PartsDamagedNum"):format(mod_constants.MOD_ID),
                     #damaged_parts)
         end
 
@@ -285,7 +304,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
 
     if container_items and #container_items > 0 then
         text = text
-            .. " <LINE> <RGB:1,1,1> "
+            .. " <LINE> <LINE> <RGB:1,1,1> "
             .. getText(("Tooltip_%s_HasItems"):format(mod_constants.MOD_ID))
 
         local ttcolour = "<RGB:1,1,0> "
@@ -297,10 +316,14 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
 
         for i = 1, #container_items do
             local part = container_items[i]
+
+            local trans_key = "IGUI_VehiclePart" .. part
+            local trans_val = getText(trans_key)
             text = text
                 .. " <LINE> "
                 .. ttcolour
-                .. getText("IGUI_VehiclePart" .. part)
+                .. (trans_val == trans_key
+                    and "[Hidden] " .. part or trans_val)
         end
     end
 
@@ -311,14 +334,17 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             .. " <LINE> <RGB:1,0,0> "
             .. vehicle_fullname
         not_available = true
-        logger:debug("adding option failed: Vehicle blacklisted from pinkslip use.")
+        logger:debug(
+            "adding option failed: Vehicle blacklisted from pinkslip use.")
     end
 
     -- If safehouse only.
-    if sbvars.DoSafehouseOnly then
-        local player_sq = player:getSquare()
-        local player_sq_x = player_sq:getX()
-        local player_sq_y = player_sq:getY()
+    if constants.IS_SINGLEPLAYER == false and sbvars.DoSafehouseOnly then
+        local username = player:getUsername()
+
+        local veh_sq = vehicle:getSquare()
+        local veh_sq_x = veh_sq:getX()
+        local veh_sq_y = veh_sq:getY()
 
         -- Dist from `player_sq` to `sq`.
         local sq_dist = nil
@@ -333,20 +359,22 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         for i = 1, safehouses:size() do
             local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
             if temp == nil then
-                logger:error("Safehouse was nil while looping through the safehouse list.")
+                logger:error(
+                    "Safehouse was nil while looping through the safehouse list.")
                 break
             end
 
             -- Get the closest safehouse recursively.
-            if temp:playerAllowed(player) then
+            if temp:playerAllowed(username) then
                 local x = temp:getX()
                 local y = temp:getY()
                 local x2 = temp:getX2()
                 local y2 = temp:getY2()
 
-                local center = getSquare(math.max(0, x2 - (x2 - x)), math.max(0, y2 - (y2 - y)), 0)
+                local center = getSquare(math.max(0, x2 - (x2 - x)),
+                    math.max(0, y2 - (y2 - y)), 0)
                 -- If distance is shorter, update the tracked `sq` and it's data.
-                local dist = player_sq:DistTo(center)
+                local dist = veh_sq:DistTo(center)
                 if sq_dist == nil or dist < sq_dist then
                     sq_dist = dist
                     sq_x = x
@@ -362,8 +390,9 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         end
 
         -- Is the player in the safehouse area?
-        local in_safehouse_area = sq_dist and (player_sq_x >= sq_x and player_sq_x <= sq_x2) and
-            (player_sq_y >= sq_y and player_sq_y <= sq_y2)
+        local in_safehouse_area = sq_dist and
+            (veh_sq_x >= sq_x and veh_sq_x <= sq_x2) and
+            (veh_sq_y >= sq_y and veh_sq_y <= sq_y2)
 
         -- If `sq_dist` is nil, there were no safehouses found.
         -- If we have safehouse distance disabled and are not in the safehouse.
@@ -373,7 +402,8 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
             text = text ..
                 " <LINE> <LINE> <RGB:1,0,0> " ..
-                getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants.MOD_ID))
+                getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants
+                    .MOD_ID))
             not_available = true
         end
     end
@@ -384,7 +414,8 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     and sbvars.DoAdminOverride then
         text = text
             .. " <LINE> <LINE> <RGB:0,1,0> "
-            .. getText(("Tooltip_%s_DoAdminOverride"):format(mod_constants.MOD_ID))
+            .. getText(("Tooltip_%s_DoAdminOverride"):format(mod_constants
+                .MOD_ID))
         not_available = false
     end
 
