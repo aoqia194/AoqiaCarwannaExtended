@@ -13,7 +13,6 @@ module AoqiaCarwannaExtended {
         DisplayCategory = AoqiaCarwannaExtended,
         DisplayName = Pinkslip,
         Icon = Pinkslip,
-        Tags = Pinkslip,
         Tooltip = Tooltip_AoqiaCarwannaExtended_PinkslipRandom,
         Type = Normal,
         Weight = 0.1,
