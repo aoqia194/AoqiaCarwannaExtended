@@ -43,9 +43,9 @@ end
 
 function create_pinkslip:update()
     self.character:faceThisObject(self.vehicle)
-    self.character:setMetabolicTarget(Metabolics.LightDomestic)
+    self.character:setMetabolicTarget(Metabolics.LightDomestic --[[@as float]])
 
-    if self.character:getEmitter():isPlaying(self.sound) == false then
+    if self.character:getEmitter():isPlaying(self.sound --[[@as string]]) == false then
         self.sound = self.character:playSound("CreatePinkslip")
     end
 end
@@ -121,7 +121,7 @@ function create_pinkslip:perform()
     local key = player_inventory:haveThisKeyId(self.vehicle:getKeyId())
     if key and mdata.HasKey == false then
         mdata.MakeKey = true
-        player_inventory:Remove(key)
+        player_inventory:Remove(key --[[@as string]])
     end
 
     local parts = mdata.Parts
@@ -248,10 +248,11 @@ function create_pinkslip:perform()
     mdata.PartsMissing = missing_parts
 
     -- Remove form item if required.
-    if sbvars.DoRequiresAutoForm and sbvars.DoKeepAutoForm == false then
+    if sbvars.DoRequiresAutoForm then
         logger:debug("Removing form from inventory...")
 
         local form = player_inventory:getFirstTypeRecurse(mod_constants.MOD_ID .. ".AutoForm")
+        --- @diagnostic disable-next-line: param-type-mismatch
         form:getContainer():Remove(form)
     end
 
