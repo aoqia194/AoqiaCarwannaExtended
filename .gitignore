@@ -4,6 +4,10 @@ dist/
 # Workshop Dependencies
 lib/
 
+# AoqiaZomboidUtils scripts folder symlink
+scripts
+scripts/
+
 # Blender autosave file
 *.blend1
 
