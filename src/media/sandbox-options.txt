@@ -129,12 +129,22 @@ option AoqiaCarwannaExtended.PinkslipWeight
 	translation = AoqiaCarwannaExtended_PinkslipWeight,
 }
 
-option AoqiaCarwannaExtended.PinkslipLootBlacklist = {
+option AoqiaCarwannaExtended.PinkslipLootBlacklist
+{
 	type = string,
 	default =,
 
     page = AoqiaCarwannaExtended,
 	translation = AoqiaCarwannaExtended_PinkslipLootBlacklist,
+}
+
+option AoqiaCarwannaExtended.DoUnassignInterior
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoUnassignInterior,
 }
 
 /* Main Vehicle Stuff ------------------------- */
@@ -249,7 +259,8 @@ option AoqiaCarwannaExtended.DoShowAllParts
 	translation = AoqiaCarwannaExtended_DoShowAllParts,
 }
 
-option AoqiaCarwannaExtended.PartWhitelist = {
+option AoqiaCarwannaExtended.PartWhitelist
+{
 	type = string,
 	default =,
 
@@ -257,7 +268,8 @@ option AoqiaCarwannaExtended.PartWhitelist = {
 	translation = AoqiaCarwannaExtended_PartWhitelist,
 }
 
-option AoqiaCarwannaExtended.TrailerBlacklist = {
+option AoqiaCarwannaExtended.TrailerBlacklist
+{
 	type = string,
 	default = Base.UnimogTrailer;Base.TrailerTSMega;Base.TrailerFirst;Base.TrailerGenerator;Base.TrailerHome;Base.TrailerKbac;Base.TrailerSecond;Base.isoContainer2;Base.isoContainer3tanker;Base.isoContainer4;Base.isoContainer5;Base.TrailerKbacRSWater;Rotators.TrailerWaterSmall;Base.M870A1,
 
@@ -265,7 +277,8 @@ option AoqiaCarwannaExtended.TrailerBlacklist = {
 	translation = AoqiaCarwannaExtended_TrailerBlacklist,
 }
 
-option AoqiaCarwannaExtended.VehicleBlacklist = {
+option AoqiaCarwannaExtended.VehicleBlacklist
+{
 	type = string,
 	default =,
 
@@ -324,7 +337,8 @@ option AoqiaCarwannaExtended.DoZedLoot
 	translation = AoqiaCarwannaExtended_DoZedLoot,
 }
 
-option AoqiaCarwannaExtended.ZedLootChance = {
+option AoqiaCarwannaExtended.ZedLootChance
+{
 	type = double,
 	default = 0.01,
 	min = 0.0000001,
@@ -343,6 +357,15 @@ option AoqiaCarwannaExtended.SeparatorModSupport
 
 	page = AoqiaCarwannaExtended,
 	translation = AoqiaCarwannaExtended_SeparatorModSupport,
+}
+
+option AoqiaCarwannaExtended.DoCompatRvInteriors
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoCompatRvInteriors,
 }
 
 option AoqiaCarwannaExtended.DoCompatTsarMod

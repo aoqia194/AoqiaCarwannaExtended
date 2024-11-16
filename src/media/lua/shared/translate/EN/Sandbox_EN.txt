@@ -17,7 +17,7 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_DoRequiresAutoForm_tooltip = "Requires an AutoForm to convert vehicles to pinkslips.",
 
     Sandbox_AoqiaCarwannaExtended_DoKeepAutoForm = "Keep AutoForm",
-    Sandbox_AoqiaCarwannaExtended_DoKeepAutoForm_tooltip = "Lets the player keep the AutoForm instead of removing it from their inventory when creating a pinkslip.",
+    Sandbox_AoqiaCarwannaExtended_DoKeepAutoForm_tooltip = "Allows the player who claims a pinkslip to get the AutoForm used to create it.",
 
     Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot = "Enable AutoForm Loot",
     Sandbox_AoqiaCarwannaExtended_DoAutoFormLoot_tooltip = "Adds the Auto Form to the loot tables.",
@@ -42,6 +42,9 @@ Sandbox_EN = {
 
     Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist = "Pinkslip Blacklist",
     Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist_tooltip = "A list of generated pinkslip vehicles that should never spawn naturally. <LINE> Example: Base.Van;Base.SUV",
+
+    Sandbox_AoqiaCarwannaExtended_DoUnassignInterior = "Unassign Interior",
+    Sandbox_AoqiaCarwannaExtended_DoUnassignInterior_tooltip = "With RV Interiors compatibility enabled, allows the pinkslip vehicle to not keep the interior assigned. <LINE> This does not delete the interior from the world itself!",
 
     /* Main Vehicle Stuff --------------------- */
     Sandbox_AoqiaCarwannaExtended_SeparatorMainVehicleStuff = "-------- Main Vehicle Stuff --------",
@@ -108,6 +111,9 @@ Sandbox_EN = {
 
     /* Mod Support Sandbox Options ------------ */
     Sandbox_AoqiaCarwannaExtended_SeparatorModSupport = "-------- Mod Support --------",
+
+    Sandbox_AoqiaCarwannaExtended_DoCompatRvInteriors = "RV Interiors Compatibility",
+    Sandbox_AoqiaCarwannaExtended_DoCompatRvInteriors_tooltip = "Provides compatibility with RV Interiors mod.",
 
     Sandbox_AoqiaCarwannaExtended_DoCompatTsarMod = "TsarLib 2.0 Compatibility",
     Sandbox_AoqiaCarwannaExtended_DoCompatTsawMod_tooltip = "Provides experimental support for TsarLib's vehicle modifications.",

@@ -3,6 +3,7 @@ Tooltip_EN = {
     Tooltip_AoqiaCarwannaExtended_Blacklisted = "This vehicle is blacklisted!",
     Tooltip_AoqiaCarwannaExtended_HasPassengers = "This vehicle has passengers!",
     Tooltip_AoqiaCarwannaExtended_Hotwired = "This vehicle is hotwired.",
+    Tooltip_AoqiaCarwannaExtended_PlayersInInterior = "There are players in the interior!",
 
     Tooltip_AoqiaCarwannaExtended_DoSafehouseOnly = "Can only be claimed in or near a safehouse protected area.",
 

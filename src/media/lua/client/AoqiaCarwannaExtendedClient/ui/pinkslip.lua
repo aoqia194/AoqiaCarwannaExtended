@@ -64,11 +64,23 @@ end
 --- @param player IsoPlayer
 --- @param vehicle BaseVehicle
 function pinkslip.confirm_dialog(player, vehicle)
+    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
+
     local player_num = player:getPlayerNum()
 
-    local confirm_text = getText(
-        ("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
-        getText("IGUI_VehicleName" .. vehicle:getScript():getName()))
+    local interior_warning = nil
+    if sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior and RVInterior.vehicleHasInteriorParameters(vehicle) then
+        interior_warning = getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID))
+    end
+
+    local confirm_text = getText(("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
+            getText("IGUI_VehicleName" .. vehicle:getScript():getName()))
+        .. " <LINE> <RGB:1,0,0> "
+
+    if interior_warning then
+        confirm_text = confirm_text .. interior_warning
+    end
+
     local modal = ISModalRichText:new(
         0,
         0,
@@ -400,11 +412,31 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         if sq_dist == nil
         or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
-            text = text ..
-                " <LINE> <LINE> <RGB:1,0,0> " ..
-                getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants
-                    .MOD_ID))
+            text = text
+                .. " <LINE> <LINE> <RGB:1,0,0> "
+                .. getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants.MOD_ID))
             not_available = true
+        end
+    end
+
+    -- Shouldn't be able to claim if your friends are in the interior LOL.
+    if sbvars.DoCompatRvInteriors and RVInterior.vehicleHasInteriorParameters(vehicle) then
+        local interior_vehicle_name = RVInterior.getVehicleName(vehicle_name)
+        local interior_vehicle_moddata = RVInterior.getVehicleModData(vehicle,
+            RVInterior.getInteriorParameters(interior_vehicle_name))
+
+        if interior_vehicle_moddata then
+            local online_players = getOnlinePlayers()
+            for i = 1, online_players:size() do
+                local target = online_players:get(i - 1) --[[@as IsoPlayer]]
+
+                if RVInterior.playerInsideInterior(target) == interior_vehicle_name then
+                    text = text
+                        .. " <LINE> <LINE> <RGB:1,0,0> "
+                        .. getText(("Tooltip_%s_PlayersInInterior"):format(mod_constants.MOD_ID))
+                    not_available = true
+                end
+            end
         end
     end
 
