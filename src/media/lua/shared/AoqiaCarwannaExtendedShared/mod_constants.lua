@@ -9,7 +9,7 @@ local logger = require("AoqiaZomboidUtilsShared/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "0.1.0"
+mod_constants.MOD_VERSION = "0.2.0"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
@@ -78,6 +78,7 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field DoDynamicPinkslipWeight boolean
 --- @field PinkslipWeight float
 --- @field PinkslipLootBlacklist string
+--- @field DoUnassignInterior boolean
 --- Main Vehicle Stuff
 --- @field DoVehicleLoot boolean
 --- @field DoCanHotwire boolean
@@ -100,6 +101,7 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field DoZedLoot boolean
 --- @field ZedLootChance float
 --- Mod Compatibility
+--- @field DoCompatRvInteriors boolean
 --- @field DoCompatTsarMod boolean
 --- @field DoCompatUdderlyRespawn boolean
 --- @field DoCompatColorExperimental boolean
