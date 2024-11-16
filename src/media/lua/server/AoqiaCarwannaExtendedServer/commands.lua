@@ -36,13 +36,22 @@ function commands.spawn_vehicle(player, args)
     logger:info_server("Spawning vehicle (%s) at (%f, %f, %f).",
         tostring(args.FullType), x, y, z)
 
-    -- Check if vehicle exists
+    -- Check if player is on Z level 0.
+    -- The engine is limited to only spawning vehicles on Z-level 0.
+    if z > 0 then
+        logger:info_server("Failed to spawn vehicle as the player is not on Z-level 0.")
+        player.setHaloNote(getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
+
+        return
+    end
+
+    -- Check if vehicle exists.
     if ScriptManager:getVehicle(args.FullType) == nil then
         logger:warn_server(
             "Failed to spawn vehicle as the vehicle does not exist.")
-        player:setHaloNote(getText(
-            ("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)
-        ))
+        player.setHaloNote(getText(("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
 
         return
     end
@@ -52,9 +61,8 @@ function commands.spawn_vehicle(player, args)
     and player:getInventory():containsTypeRecurse("AutoForm") == false then
         logger:info_server(
             "Failed to spawn vehicle as the player does not have an AutoForm.")
-        player:setHaloNote(getText(
-            ("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)
-        ))
+        player.setHaloNote(getText(("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
 
         return
     end
@@ -63,9 +71,9 @@ function commands.spawn_vehicle(player, args)
     if square:isVehicleIntersecting() then
         logger:info_server(
             "Failed to spawn vehicle, there is already a vehicle spawned there.")
-        player:setHaloNote(getText(
-            ("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)
-        ))
+        player.setHaloNote(
+            getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
 
         return
     end
@@ -164,6 +172,21 @@ function commands.spawn_vehicle(player, args)
             --- @diagnostic disable-next-line
             square:AddWorldInventoryItem(new_key, x, y, z)
         end
+    end
+
+    -- Sync mod data to vehicle.
+    if args.ModData then
+        logger:debug_server("Syncing mod data.")
+
+        for k, v in pairs(args.ModData) do
+            vehicle:getModData()[k] = v
+        end
+    end
+
+    -- Give the player the autoform back if sandbox option is on
+    if sbvars.DoKeepAutoForm then
+        --- @diagnostic disable-next-line: redundant-parameter
+        player:sendObjectChange("addItem", { item = InventoryItemFactory.CreateItem("AutoForm") })
     end
 
     local parts = args.Parts
