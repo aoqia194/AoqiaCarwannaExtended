@@ -183,6 +183,12 @@ function commands.spawn_vehicle(player, args)
         end
     end
 
+    if sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior then
+        logger:debug_server("Unassigning vehicle (%s) interior id (%d).", vehicle_id,
+            vehicle:getModData().rvInterior.interiorInstance)
+        vehicle:getModData().rvInterior = nil
+    end
+
     -- Give the player the autoform back if sandbox option is on
     if sbvars.DoKeepAutoForm then
         --- @diagnostic disable-next-line: redundant-parameter
