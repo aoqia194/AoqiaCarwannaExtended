@@ -39,21 +39,29 @@ end
 Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, player, item)
     --- @cast player IsoPlayer
 
-    local perform = true
-
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
+
+    local player_username = player:getUsername()
+    logger:info_server("Player (%s) <%s> is trying to claim a vehicle using pinkslip!",
+        tostring(player_username), tostring(getSteamIDFromUsername(player_username)))
+
+    local perform = true
 
     -- If the player is not outside, don't claim it.
     local player_sq = player:getSquare()
     if player:isOutside() == false then
-        player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside")
-            :format(mod_constants.MOD_ID)))
+        player.setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
+        logger:debug_server("Failed to spawn vehicle as the player is not outside.")
         perform = false
     end
 
     if player_sq:isVehicleIntersecting() then
-        player:setHaloNote(getText(("IGUI_%s_HaloNote_VehicleIntersecting")
-            :format(mod_constants.MOD_ID)))
+        player.setHaloNote(
+            getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
+            1, 0, 0, (128.0 * 4))
+        logger:debug_server(
+            "Failed to spawn vehicle as the player is intersecting with another vehicle.")
         perform = false
     end
 
@@ -77,7 +85,7 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         for i = 1, safehouses:size() do
             local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
             if temp == nil then
-                logger:error(
+                logger:error_server(
                     "Safehouse was nil while looping through the safehouse list.")
                 break
             end
@@ -104,7 +112,7 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         end
 
         if sq_dist == nil then
-            logger:debug("sq_dist was nil, even after safehouse loop.")
+            logger:debug_server("sq_dist was nil, even after safehouse loop.")
         end
 
         -- Is the player in the safehouse area?
@@ -118,8 +126,9 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         if sq_dist == nil
         or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
-            player:setHaloNote(getText(("IGUI_%s_HaloNote_NotInSafehouse")
-                :format(mod_constants.MOD_ID)))
+            player.setHaloNote(
+                getText(("IGUI_%s_HaloNote_NotInSafehouse"):format(mod_constants.MOD_ID)),
+                1, 0, 0, (128.0 * 4))
 
             perform = false
         end
@@ -150,9 +159,9 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     local generated_key = false
     if mdata.Parts == nil then
         if sbvars.DoAllowGeneratedPinkslips == false then
-            player:setHaloNote(
-                getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips")
-                    :format(mod_constants.MOD_ID)))
+            player.setHaloNote(
+                getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
+                1, 0, 0, (128.0 * 4))
 
             return
         end
@@ -164,20 +173,20 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         local count = 1
         while true do
             if count >= 60 then
-                logger:error("Unable to select random vehicle due to timeout.")
+                logger:error_server("Unable to select random vehicle due to timeout.")
                 return
             end
 
             vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size() - 1)) --[[@as string]]
             local name_lower = vehicle_name:lower()
-            logger:debug("Selecting random vehicle (%s).", vehicle_name)
+            logger:debug_server("Selecting random vehicle (%s).", vehicle_name)
 
             -- If vehicle not blacklisted, trailer, burnt, or smashed.
             if  blacklist.vehicle_blacklist.index[vehicle_name] == nil
             and name_lower:contains("trailer") == false
             and name_lower:contains("burnt") == false
             and name_lower:contains("smashed") == false then
-                logger:debug("Random vehicle selected.")
+                logger:debug_server("Random vehicle selected.")
                 break
             end
 
@@ -205,6 +214,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     args.Hotwired = mdata.Hotwired or nil
     args.Rust = mdata.Rust or nil
     args.Skin = mdata.Skin or nil
+    args.ModData = mdata.ModData or nil
 
     args.Blood = mdata.Blood and {
         F = mdata.Blood.F,
