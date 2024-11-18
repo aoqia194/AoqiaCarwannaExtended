@@ -50,16 +50,16 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
     -- If the player is not outside, don't claim it.
     local player_sq = player:getSquare()
     if player:isOutside() == false then
-        player.setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+        player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside"):format(mod_constants.MOD_ID)),
+            255, 0, 0, (128.0 * 4))
         logger:debug_server("Failed to spawn vehicle as the player is not outside.")
         perform = false
     end
 
     if player_sq:isVehicleIntersecting() then
-        player.setHaloNote(
+        player:setHaloNote(
             getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+            255, 0, 0, (128.0 * 4))
         logger:debug_server(
             "Failed to spawn vehicle as the player is intersecting with another vehicle.")
         perform = false
@@ -126,9 +126,9 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         if sq_dist == nil
         or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
-            player.setHaloNote(
+            player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NotInSafehouse"):format(mod_constants.MOD_ID)),
-                1, 0, 0, (128.0 * 4))
+                255, 0, 0, (128.0 * 4))
 
             perform = false
         end
@@ -159,9 +159,9 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     local generated_key = false
     if mdata.Parts == nil then
         if sbvars.DoAllowGeneratedPinkslips == false then
-            player.setHaloNote(
+            player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
-                1, 0, 0, (128.0 * 4))
+                255, 0, 0, (128.0 * 4))
 
             return
         end
