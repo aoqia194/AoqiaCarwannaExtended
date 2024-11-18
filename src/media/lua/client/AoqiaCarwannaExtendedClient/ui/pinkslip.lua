@@ -69,7 +69,8 @@ function pinkslip.confirm_dialog(player, vehicle)
     local player_num = player:getPlayerNum()
 
     local interior_warning = nil
-    if sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior and RVInterior.vehicleHasInteriorParameters(vehicle) then
+    if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
+    and RVInterior and RVInterior.vehicleHasInteriorParameters(vehicle) then
         interior_warning = getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID))
     end
 
