@@ -51,7 +51,7 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
     local player_sq = player:getSquare()
     if player:isOutside() == false then
         player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside"):format(mod_constants.MOD_ID)),
-            255, 0, 0, (128.0 * 4))
+            (128.0 * 2))
         logger:debug_server("Failed to spawn vehicle as the player is not outside.")
         perform = false
     end
@@ -59,7 +59,7 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
     if player_sq:isVehicleIntersecting() then
         player:setHaloNote(
             getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
-            255, 0, 0, (128.0 * 4))
+            (128.0 * 2))
         logger:debug_server(
             "Failed to spawn vehicle as the player is intersecting with another vehicle.")
         perform = false
@@ -128,7 +128,7 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NotInSafehouse"):format(mod_constants.MOD_ID)),
-                255, 0, 0, (128.0 * 4))
+                (128.0 * 2))
 
             perform = false
         end
@@ -161,7 +161,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         if sbvars.DoAllowGeneratedPinkslips == false then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
-                255, 0, 0, (128.0 * 4))
+                (128.0 * 2))
 
             return
         end
