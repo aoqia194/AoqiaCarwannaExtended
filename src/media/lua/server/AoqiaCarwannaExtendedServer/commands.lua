@@ -40,8 +40,8 @@ function commands.spawn_vehicle(player, args)
     -- The engine is limited to only spawning vehicles on Z-level 0.
     if z > 0 then
         logger:info_server("Failed to spawn vehicle as the player is not on Z-level 0.")
-        player.setHaloNote(getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+        player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
+            (128.0 * 2))
 
         return
     end
@@ -50,8 +50,8 @@ function commands.spawn_vehicle(player, args)
     if ScriptManager:getVehicle(args.FullType) == nil then
         logger:warn_server(
             "Failed to spawn vehicle as the vehicle does not exist.")
-        player.setHaloNote(getText(("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+        player:setHaloNote(getText(("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)),
+            (128.0 * 2))
 
         return
     end
@@ -61,8 +61,8 @@ function commands.spawn_vehicle(player, args)
     and player:getInventory():containsTypeRecurse("AutoForm") == false then
         logger:info_server(
             "Failed to spawn vehicle as the player does not have an AutoForm.")
-        player.setHaloNote(getText(("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+        player:setHaloNote(getText(("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)),
+            (128.0 * 2))
 
         return
     end
@@ -71,9 +71,9 @@ function commands.spawn_vehicle(player, args)
     if square:isVehicleIntersecting() then
         logger:info_server(
             "Failed to spawn vehicle, there is already a vehicle spawned there.")
-        player.setHaloNote(
+        player:setHaloNote(
             getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
-            1, 0, 0, (128.0 * 4))
+            (128.0 * 2))
 
         return
     end
@@ -183,10 +183,16 @@ function commands.spawn_vehicle(player, args)
         end
     end
 
-    if sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior then
+    if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
+    and RVInterior and vehicle:getModData().rvInterior then
         logger:debug_server("Unassigning vehicle (%s) interior id (%d).", vehicle_id,
             vehicle:getModData().rvInterior.interiorInstance)
-        vehicle:getModData().rvInterior = nil
+
+        -- Tell RV Interior to reset vehicle's interior data.
+        sendClientCommand("RVInteriorAdmin", "clientResetVehicle", {
+            vehicleId = vehicle_id,
+            playerId = player:getOnlineID(),
+        })
     end
 
     -- Give the player the autoform back if sandbox option is on
