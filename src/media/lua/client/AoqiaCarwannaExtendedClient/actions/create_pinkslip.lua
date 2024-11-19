@@ -8,7 +8,6 @@ local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals.
 local setmetatable = setmetatable
-local table = table
 -- TIS globals.
 local getText = getText
 local ISBaseTimedAction = ISBaseTimedAction
