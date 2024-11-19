@@ -3,10 +3,10 @@
 -- -------------------------------------------------------------------------- --
 
 -- My requires.
-local blacklists = require("AoqiaCarwannaExtendedShared/blacklists")
 local constants = require("AoqiaZomboidUtilsShared/constants")
 local create_pinkslip = require("AoqiaCarwannaExtendedClient/actions/create_pinkslip")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
+local sandbox_data = require("AoqiaCarwannaExtendedShared/sandbox_data")
 -- TIS requires.
 require("luautils")
 
@@ -33,12 +33,12 @@ local pinkslip = {}
 --- @return boolean
 function pinkslip.is_trailer(vehicle)
     local vehicle_script = vehicle:getScript()
-    if blacklists.trailer_blacklist[vehicle_script:getFullName()] then
+    if sandbox_data.trailer_blacklist[vehicle_script:getFullName()] then
         return true
     end
 
-    for i = 1, #blacklists.known_trailers do
-        local trailer = blacklists.known_trailers[i]
+    for i = 1, #sandbox_data.known_trailers do
+        local trailer = sandbox_data.known_trailers[i]
 
         local attachment = vehicle_script:getAttachmentById(trailer)
         if attachment and attachment:getCanAttach() then
@@ -225,7 +225,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             or part_type:isEmpty()
             or item then
                 if  part:getCondition() < sbvars.MinimumCondition
-                and blacklists.part_whitelist[part_id] == nil then
+                and sandbox_data.part_whitelist[part_id] == nil then
                     damaged_parts[#damaged_parts + 1] = part_id
                 end
 
@@ -238,7 +238,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             end
 
             -- Add missing parts if it is missing
-            if blacklists.part_whitelist[part_id] == nil then
+            if sandbox_data.part_whitelist[part_id] == nil then
                 missing_parts[#missing_parts + 1] = part_id
             end
         until true
@@ -340,7 +340,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         end
     end
 
-    if blacklists.vehicle_blacklist[vehicle_fullname] then
+    if sandbox_data.vehicle_blacklist[vehicle_fullname] then
         text = text
             .. " <LINE> <RGB:1,1,1> "
             .. getText(("Tooltip_%s_Blacklisted"):format(mod_constants.MOD_ID))
@@ -370,32 +370,46 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         -- Loop through the safehouses and get the closest one.
         local safehouses = SafeHouse.getSafehouseList()
         for i = 1, safehouses:size() do
-            local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
-            if temp == nil then
-                logger:error(
-                    "Safehouse was nil while looping through the safehouse list.")
-                break
-            end
-
-            -- Get the closest safehouse recursively.
-            if temp:playerAllowed(username) then
-                local x = temp:getX()
-                local y = temp:getY()
-                local x2 = temp:getX2()
-                local y2 = temp:getY2()
-
-                local center = getSquare(math.max(0, x2 - (x2 - x)),
-                    math.max(0, y2 - (y2 - y)), 0)
-                -- If distance is shorter, update the tracked `sq` and it's data.
-                local dist = veh_sq:DistTo(center)
-                if sq_dist == nil or dist < sq_dist then
-                    sq_dist = dist
-                    sq_x = x
-                    sq_y = y
-                    sq_x2 = x2
-                    sq_y2 = y2
+            repeat
+                local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
+                if temp == nil then
+                    logger:error(
+                        "Safehouse was nil while looping through the safehouse list.")
+                    break
                 end
-            end
+
+                -- Get the closest safehouse recursively.
+                if temp:playerAllowed(username) then
+                    local x = temp:getX()
+                    local y = temp:getY()
+                    local w = temp:getW()
+                    local h = temp:getH()
+                    local x2 = temp:getX2()
+                    local y2 = temp:getY2()
+
+                    -- local center = getSquare(math.max(0, x2 - (x2 - x)), math.max(0, y2 - (y2 - y)),
+                    --     0)
+                    -- if center == nil then
+                    --     logger:debug(
+                    --         "Failed to get safehouse square because the chunk isn't loaded. Assuming that the player is not near their safehouse.")
+                    --     break
+                    -- end
+
+                    -- If distance is shorter, update the tracked `sq` and it's data.
+                    --- @diagnostic disable: redundant-parameter
+                    local dist = veh_sq:DistTo(
+                        math.max(0, (x + (w / 2))),
+                        math.max(0, (y + (h / 2))))
+                    --- @diagnostic enable: redundant-parameter
+                    if sq_dist == nil or dist < sq_dist then
+                        sq_dist = dist
+                        sq_x = x
+                        sq_y = y
+                        sq_x2 = x2
+                        sq_y2 = y2
+                    end
+                end
+            until true
         end
 
         if sq_dist == nil then
