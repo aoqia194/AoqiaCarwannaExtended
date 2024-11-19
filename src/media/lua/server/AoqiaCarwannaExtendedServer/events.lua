@@ -3,7 +3,6 @@
 -- -------------------------------------------------------------------------- --
 
 -- My modules.
-local blacklists = require("AoqiaCarwannaExtendedShared/blacklists")
 local commands = require("AoqiaCarwannaExtendedServer/commands")
 local distributions = require("AoqiaCarwannaExtendedServer/distributions")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
@@ -33,7 +32,6 @@ end
 
 --- @type Callback_OnInitGlobalModData
 function events.init_global_moddata(new_game)
-    blacklists.init()
     distributions.init()
 end
 
