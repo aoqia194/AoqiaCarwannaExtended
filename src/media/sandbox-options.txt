@@ -129,13 +129,13 @@ option AoqiaCarwannaExtended.PinkslipWeight
 	translation = AoqiaCarwannaExtended_PinkslipWeight,
 }
 
-option AoqiaCarwannaExtended.PinkslipLootBlacklist
+option AoqiaCarwannaExtended.PinkslipGeneratedBlacklist
 {
 	type = string,
-	default =,
+	default = Base.SportsCar_ez;Base.ModernCar_ez,
 
     page = AoqiaCarwannaExtended,
-	translation = AoqiaCarwannaExtended_PinkslipLootBlacklist,
+	translation = AoqiaCarwannaExtended_PinkslipGeneratedBlacklist,
 }
 
 option AoqiaCarwannaExtended.DoUnassignInterior
@@ -145,6 +145,15 @@ option AoqiaCarwannaExtended.DoUnassignInterior
 
 	page = AoqiaCarwannaExtended,
 	translation = AoqiaCarwannaExtended_DoUnassignInterior,
+}
+
+option AoqiaCarwannaExtended.PinkslipGeneratedChances
+{
+	type = string,
+	default = Base.CarStationWagon=100;Base.CarStationWagon2=100;Base.SportsCar=100;Base.PickUpTruck=100;Base.PickUpTruckLights=100;Base.PickUpTruckLightsFire=100;Base.PickUpTruckMccoy=100;Base.SmallCar=100;Base.CarNormal=100;Base.CarLights=100;Base.CarLightsPolice=100;Base.CarTaxi=100;Base.CarTaxi2=100;Base.ModernCar=100;Base.ModernCar02=100;Base.ModernCar_Martin=100;Base.StepVan=100;Base.StepVanMail=100;Base.StepVan_Heralds=100;Base.StepVan_Scarlet=100;Base.PickUpVan=100;Base.PickUpVanLights=100;Base.PickUpVanLightsFire=100;Base.PickUpVanLightsPolice=100;Base.PickUpVanMccoy=100;Base.OffRoad=100;Base.SUV=100;Base.Van=100;Base.VanAmbulance=100;Base.VanRadio=100;Base.VanRadio_3N=100;Base.VanSeats=100;Base.VanSpecial=100;Base.VanSpiffo=100;Base.Van_KnoxDisti=100;Base.Van_LectroMax=100;Base.Van_MassGenFac=100;Base.Van_Transit=100;Base.SmallCar02=100;Base.CarLuxury=100,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_PinkslipGeneratedChances,
 }
 
 /* Main Vehicle Stuff ------------------------- */
