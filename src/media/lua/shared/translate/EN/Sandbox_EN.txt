@@ -40,11 +40,14 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_PinkslipWeight = "Pinkslip Weight",
     Sandbox_AoqiaCarwannaExtended_PinkslipWeight_tooltip = "If Dynamic Pinkslip Weight is disabled, it will use this weight.",
 
-    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist = "Pinkslip Blacklist",
-    Sandbox_AoqiaCarwannaExtended_PinkslipLootBlacklist_tooltip = "A list of generated pinkslip vehicles that should never spawn naturally. <LINE> Example: Base.Van;Base.SUV",
+    Sandbox_AoqiaCarwannaExtended_PinkslipGeneratedBlacklist = "Generated Pinkslip Blacklist",
+    Sandbox_AoqiaCarwannaExtended_PinkslipGeneratedBlacklist_tooltip = "A list of generated pinkslip vehicles that should never spawn naturally. <LINE> Example: Base.Van;Base.SUV",
 
     Sandbox_AoqiaCarwannaExtended_DoUnassignInterior = "Unassign Interior",
     Sandbox_AoqiaCarwannaExtended_DoUnassignInterior_tooltip = "With RV Interiors compatibility enabled, allows the pinkslip vehicle to not keep the interior assigned. <LINE> This does not delete the interior from the world itself!",
+
+    Sandbox_AoqiaCarwannaExtended_PinkslipGeneratedChances = "Generated Pinkslip Vehicle Chances",
+    Sandbox_AoqiaCarwannaExtended_PinkslipGeneratedChances_tooltip = "Lets you tweak the chance for vehicles to appear when claiming a generated pinkslip.",
 
     /* Main Vehicle Stuff --------------------- */
     Sandbox_AoqiaCarwannaExtended_SeparatorMainVehicleStuff = "-------- Main Vehicle Stuff --------",
