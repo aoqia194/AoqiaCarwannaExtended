@@ -125,6 +125,16 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         return
     end
 
+    -- Check if the player has permissions with AdvancedVehicleClaimSystem.
+    if AVCS then
+        local perm = AVCS.checkPermission(player, vehicle)
+        if type(perm) == "boolean" and perm == false then
+            return
+        elseif type(perm) == "table" then
+            if perm.permissions == false then return end
+        end
+    end
+
     -- Context option and tooltip setup below.
 
     local option = context:addOption(
