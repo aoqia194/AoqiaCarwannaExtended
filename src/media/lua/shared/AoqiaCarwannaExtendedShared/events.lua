@@ -7,6 +7,7 @@ local Events = Events
 
 -- My Mod Modules
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
+local sandbox_data = require("AoqiaCarwannaExtendedShared/sandbox_data")
 local tweaks = require("AoqiaCarwannaExtendedShared/tweaks")
 
 local logger = mod_constants.LOGGER
@@ -17,6 +18,7 @@ local events = {}
 
 --- @type Callback_OnInitGlobalModData
 function events.init_global_moddata(new_game)
+    sandbox_data.init()
     tweaks.init()
 end
 
