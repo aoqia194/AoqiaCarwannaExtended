@@ -40,8 +40,12 @@ function commands.spawn_vehicle(player, args)
     -- The engine is limited to only spawning vehicles on Z-level 0.
     if z > 0 then
         logger:info_server("Failed to spawn vehicle as the player is not on Z-level 0.")
-        player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
+        player:setHaloNote(
+            getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
 
         return
     end
@@ -50,22 +54,18 @@ function commands.spawn_vehicle(player, args)
     if ScriptManager:getVehicle(args.FullType) == nil then
         logger:warn_server(
             "Failed to spawn vehicle as the vehicle does not exist.")
-        player:setHaloNote(getText(("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
+        player:setHaloNote(
+            getText(("IGUI_%s_HaloNote_NilVehicle"):format(mod_constants.MOD_ID)),
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
 
         return
     end
 
-    -- Check if player has AutoForm
-    if  player:getAccessLevel() ~= "Admin"
-    and player:getInventory():containsTypeRecurse("AutoForm") == false then
-        logger:info_server(
-            "Failed to spawn vehicle as the player does not have an AutoForm.")
-        player:setHaloNote(getText(("IGUI_%s_HaloNote_NoAutoForm"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
-
-        return
-    end
+    -- NOTE: Don't check for autoform here as it's impossible on the server.
+    -- It's done on the client anyway.
 
     -- Check if vehicle is already in that position.
     if square:isVehicleIntersecting() then
@@ -73,7 +73,10 @@ function commands.spawn_vehicle(player, args)
             "Failed to spawn vehicle, there is already a vehicle spawned there.")
         player:setHaloNote(
             getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
 
         return
     end
@@ -195,8 +198,9 @@ function commands.spawn_vehicle(player, args)
         })
     end
 
-    -- Give the player the autoform back if sandbox option is on
-    if sbvars.DoKeepAutoForm then
+    -- Give the player the autoform back if sandbox option is on.
+    -- Check that it's not generated to prevent buffer underflow.
+    if sbvars.DoKeepAutoForm and args.Parts then
         --- @diagnostic disable-next-line: redundant-parameter
         player:sendObjectChange("addItem", { item = InventoryItemFactory.CreateItem("AutoForm") })
     end
