@@ -3,9 +3,9 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local blacklist = require("AoqiaCarwannaExtendedShared/blacklists")
 local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
+local sandbox_data = require("AoqiaCarwannaExtendedShared/sandbox_data")
 
 -- std globals.
 local assert = assert
@@ -39,11 +39,10 @@ end
 Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, player, item)
     --- @cast player IsoPlayer
 
-    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
+    -- If the item is nil. it means that crafting menu is checking it.
+    -- if item == nil then return false end
 
-    local player_username = player:getUsername()
-    logger:info_server("Player (%s) <%s> is trying to claim a vehicle using pinkslip!",
-        tostring(player_username), tostring(getSteamIDFromUsername(player_username)))
+    local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
 
     local perform = true
 
@@ -51,7 +50,10 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
     local player_sq = player:getSquare()
     if player:isOutside() == false then
         player:setHaloNote(getText(("IGUI_%s_HaloNote_NotOutside"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
         logger:debug_server("Failed to spawn vehicle as the player is not outside.")
         perform = false
     end
@@ -59,7 +61,10 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
     if player_sq:isVehicleIntersecting() then
         player:setHaloNote(
             getText(("IGUI_%s_HaloNote_VehicleIntersecting"):format(mod_constants.MOD_ID)),
-            (128.0 * 2))
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
         logger:debug_server(
             "Failed to spawn vehicle as the player is intersecting with another vehicle.")
         perform = false
@@ -83,32 +88,46 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         -- Loop through the safehouses and get the closest one.
         local safehouses = SafeHouse.getSafehouseList()
         for i = 1, safehouses:size() do
-            local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
-            if temp == nil then
-                logger:error_server(
-                    "Safehouse was nil while looping through the safehouse list.")
-                break
-            end
-
-            -- Get the closest safehouse recursively.
-            if temp:playerAllowed(username) then
-                local x = temp:getX()
-                local y = temp:getY()
-                local x2 = temp:getX2()
-                local y2 = temp:getY2()
-
-                local center = getSquare(math.max(0, x2 - (x2 - x)),
-                    math.max(0, y2 - (y2 - y)), 0)
-                -- If distance is shorter, update the tracked `sq` and it's data.
-                local dist = player_sq:DistTo(center)
-                if sq_dist == nil or dist < sq_dist then
-                    sq_dist = dist
-                    sq_x = x
-                    sq_y = y
-                    sq_x2 = x2
-                    sq_y2 = y2
+            repeat
+                local temp = safehouses:get(i - 1) --[[@as SafeHouse | nil]]
+                if temp == nil then
+                    logger:error(
+                        "Safehouse was nil while looping through the safehouse list.")
+                    break
                 end
-            end
+
+                -- Get the closest safehouse recursively.
+                if temp:playerAllowed(username) then
+                    local x = temp:getX()
+                    local y = temp:getY()
+                    local w = temp:getW()
+                    local h = temp:getH()
+                    local x2 = temp:getX2()
+                    local y2 = temp:getY2()
+
+                    -- local center = getSquare(math.max(0, x2 - (x2 - x)), math.max(0, y2 - (y2 - y)),
+                    --     0)
+                    -- if center == nil then
+                    --     logger:debug(
+                    --         "Failed to get safehouse square because the chunk isn't loaded. Assuming that the player is not near their safehouse.")
+                    --     break
+                    -- end
+
+                    -- If distance is shorter, update the tracked `sq` and it's data.
+                    --- @diagnostic disable: redundant-parameter
+                    local dist = player_sq:DistTo(
+                        math.max(0, (x + (w / 2))),
+                        math.max(0, (y + (h / 2))))
+                    --- @diagnostic enable: redundant-parameter
+                    if sq_dist == nil or dist < sq_dist then
+                        sq_dist = dist
+                        sq_x = x
+                        sq_y = y
+                        sq_x2 = x2
+                        sq_y2 = y2
+                    end
+                end
+            until true
         end
 
         if sq_dist == nil then
@@ -128,7 +147,10 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NotInSafehouse"):format(mod_constants.MOD_ID)),
-                (128.0 * 2))
+                255.0,
+                0.0,
+                0.0,
+                (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
 
             perform = false
         end
@@ -161,7 +183,10 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         if sbvars.DoAllowGeneratedPinkslips == false then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
-                (128.0 * 2))
+                255.0,
+                0.0,
+                0.0,
+                (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
 
             return
         end
@@ -172,20 +197,37 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
 
         local count = 1
         while true do
-            if count >= 60 then
+            if count >= 10000 then
                 logger:error_server("Unable to select random vehicle due to timeout.")
                 return
             end
 
             vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size() - 1)) --[[@as string]]
             local name_lower = vehicle_name:lower()
-            logger:debug_server("Selecting random vehicle (%s).", vehicle_name)
 
-            -- If vehicle not blacklisted, trailer, burnt, or smashed.
-            if  blacklist.vehicle_blacklist.index[vehicle_name] == nil
+            local blacklisted = sandbox_data.pinkslip_blacklist.index[vehicle_name] ~= nil
+
+            -- The vehicle's chance to be selected. Influenced by pinkslip weights.
+            local chance = blacklisted == false and 100 or 0
+
+            -- If there is no chance listed in the table, assume 100% chance?
+            local entry_idx = sandbox_data.pinkslip_chances.index[vehicle_name]
+            if entry_idx then
+                local entry_type = sandbox_data.pinkslip_chances.values[entry_idx]
+                chance = entry_type.chance
+            end
+
+            logger:debug_server("Checking random vehicle (%s) with chance (%d).",
+                vehicle_name,
+                chance)
+
+            -- If vehicle is not blaclisted, trailer, burnt, or smashed.
+            -- Or if vehicle is blacklisted but has a chance to spawn.
+            if  (blacklisted == false or chance > 0)
             and name_lower:contains("trailer") == false
             and name_lower:contains("burnt") == false
-            and name_lower:contains("smashed") == false then
+            and name_lower:contains("smashed") == false
+            and ZombRand(1, 100) <= chance then
                 logger:debug_server("Random vehicle selected.")
                 break
             end
@@ -196,7 +238,8 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
             "No vehicle found when trying to claim random vehicle from pinkslip.")
 
         args.FullType = vehicle_name
-        generated_key = ZombRand(0, 100) <= 25 and true or false
+        -- generated_key = ZombRand(0, 100) <= 25 and true or false
+        generated_key = true
     else
         args.Parts = mdata.Parts
         args.FullType = mdata.FullType
