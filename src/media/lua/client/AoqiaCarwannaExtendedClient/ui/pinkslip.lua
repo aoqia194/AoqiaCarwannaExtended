@@ -128,10 +128,9 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     -- Check if the player has permissions with AdvancedVehicleClaimSystem.
     if AVCS then
         local perm = AVCS.checkPermission(player, vehicle)
-        if type(perm) == "boolean" and perm == false then
+        if (type(perm) == "boolean" and perm == false)
+        or (type(perm) == "table" and perm.permissions == false) then
             return
-        elseif type(perm) == "table" then
-            if perm.permissions == false then return end
         end
     end
 
@@ -465,6 +464,14 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
                 end
             end
         end
+    end
+
+    -- If the vehicle needs to be unclaimed.
+    if AVCS and sbvars.DoRequiresUnclaimed then
+        text = text
+            .. " <LINE> <LINE> <RGB:1,0,0> "
+            .. getText(("Tooltip_%s_RequiresUnclaimed"):format(mod_constants.MOD_ID))
+        not_available = true
     end
 
     -- Do admin override if enabled.

@@ -194,6 +194,15 @@ option AoqiaCarwannaExtended.DoClearInventory
 	translation = AoqiaCarwannaExtended_DoClearInventory,
 }
 
+option AoqiaCarwannaExtended.DoRequiresUnclaimed
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoRequiresUnclaimed,
+}
+
 option AoqiaCarwannaExtended.DoFixHiddenParts
 {
 	type = boolean,

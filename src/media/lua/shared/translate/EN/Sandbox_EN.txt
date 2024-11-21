@@ -61,6 +61,9 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_DoClearInventory = "Clear Vehicle Inventory",
     Sandbox_AoqiaCarwannaExtended_DoClearInventory_tooltip = "Requires players to clear a vehicle's inventory before claiming it. <LINE> Whitelisted parts are excluded. <LINE> <RGB:1,0,0> This mod does NOT save items in vehicles!",
 
+    Sandbox_AoqiaCarwannaExtended_DoRequiresUnclaimed = "Require Vehicle To Be Unclaimed",
+    Sandbox_AoqiaCarwannaExtended_DoRequiresUnclaimed_tooltip = "Requires the vehicle to be unclaimed before converting it to a pinkslip. <LINE> If disabled, it requires the vehicle to be claimed. <LINE> Ignored if AVCS mod isn't enabled on the server.",
+
     Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts = "Fix Hidden Parts",
     Sandbox_AoqiaCarwannaExtended_DoFixHiddenParts_tooltip = "Repairs parts that are not displayed to the player. <LINE> This will fix issues with vehicles spawning in at less than 100% overall condition. <LINE> <RGB:1,0,0> It has potential to cause some unintended side effects.",
 
