@@ -221,6 +221,8 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             local part_cat = part:getCategory()
             local item = part:getInventoryItem()
 
+            -- Ignores hidden parts.
+            -- TsarATA's parts are nodisplay but also displayable, so still loop them!
             if  sbvars.DoIgnoreHiddenParts
             and part_cat == "nodisplay"
             and (sbvars.DoCompatTsarMod == false
