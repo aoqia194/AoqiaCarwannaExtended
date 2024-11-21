@@ -9,7 +9,7 @@ local logger = require("AoqiaZomboidUtilsShared/logger")
 local mod_constants = {}
 
 mod_constants.MOD_ID = "AoqiaCarwannaExtended"
-mod_constants.MOD_VERSION = "0.3.0"
+mod_constants.MOD_VERSION = "0.4.0"
 
 mod_constants.LOGGER = logger:new(mod_constants.MOD_ID)
 
@@ -28,7 +28,6 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field Locked boolean | nil If the part can and should be locked.
 --- @field MissingItem boolean | nil If the part item is missing.
 --- @field ModData table<any, any> | nil The part's mod data table to be replicated.
---- @field Model unknown | nil Some scuffed TsarMod stuff that I don't know about.
 --- @field NoDisplay boolean | nil If the part is marked as nodisplay.
 --- @field Open boolean | nil If the part can and should be opened.
 --- @field Temperature int | nil The temperate for the Heater part.
@@ -60,7 +59,6 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field PinkslipWeight float | nil The dynamic weight of the pinkslip item.
 --- @field Rust float
 --- @field Skin int
---- @field Weight float The weight of the vehicle.
 
 --- The SandboxVars mod data struct.
 --- @class (exact) SandboxVarsDummy
