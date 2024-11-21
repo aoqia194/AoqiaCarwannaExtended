@@ -126,10 +126,11 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     end
 
     -- Check if the player has permissions with AdvancedVehicleClaimSystem.
+    local avcs_perm = nil
     if AVCS then
-        local perm = AVCS.checkPermission(player, vehicle)
-        if (type(perm) == "boolean" and perm == false)
-        or (type(perm) == "table" and perm.permissions == false) then
+        avcs_perm = AVCS.checkPermission(player, vehicle)
+        if (type(avcs_perm) == "boolean" and avcs_perm == false)
+        or (type(avcs_perm) == "table" and avcs_perm.permissions == false) then
             return
         end
     end
@@ -467,7 +468,8 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     end
 
     -- If the vehicle needs to be unclaimed.
-    if AVCS and sbvars.DoRequiresUnclaimed then
+    -- checkPermission will return true for unclaimed vehicles.
+    if AVCS and sbvars.DoRequiresUnclaimed and type(avcs_perm) == "table" then
         text = text
             .. " <LINE> <LINE> <RGB:1,0,0> "
             .. getText(("Tooltip_%s_RequiresUnclaimed"):format(mod_constants.MOD_ID))
