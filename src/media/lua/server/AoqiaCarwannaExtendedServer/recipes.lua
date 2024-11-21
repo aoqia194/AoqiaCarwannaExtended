@@ -179,8 +179,8 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     local sub_mdata = nil --[[@as ModDataDummy | nil]]
     if mdata and mdata[mod_constants.MOD_ID] == nil then
         mdata[mod_constants.MOD_ID] = {}
-        sub_mdata = mdata[mod_constants.MOD_ID]
     end
+    sub_mdata = mdata[mod_constants.MOD_ID]
 
     if sub_mdata == nil then
         logger:warn_server("Pinkslip sub_mdata failed to create/retrieve. THIS IS SO BAD!!!")
