@@ -173,13 +173,26 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
 
     --- @diagnostic disable-next-line: undefined-field
 
-    local mdata = item:getModData() --[[@as ModDataDummy]]
+    local mdata = item:getModData()
+
+    -- Make sure the table exists in the pinkslip.
+    local sub_mdata = nil --[[@as ModDataDummy | nil]]
+    if mdata and mdata[mod_constants.MOD_ID] == nil then
+        mdata[mod_constants.MOD_ID] = {}
+        sub_mdata = mdata[mod_constants.MOD_ID]
+    end
+
+    if sub_mdata == nil then
+        logger:warn_server("Pinkslip sub_mdata failed to create/retrieve. THIS IS SO BAD!!!")
+        return
+    end
+
     local args = {} --[[@as ModDataDummy]] --- @diagnostic disable-line
 
     -- If there are no parts, it means the pinkslip isn't player-made.
     -- We have to handle it differently because it will not have stored any proper data for parts.
     local generated_key = false
-    if mdata.Parts == nil then
+    if sub_mdata.Parts == nil then
         if sbvars.DoAllowGeneratedPinkslips == false then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
@@ -241,32 +254,33 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         -- generated_key = ZombRand(0, 100) <= 25 and true or false
         generated_key = true
     else
-        args.Parts = mdata.Parts
-        args.FullType = mdata.FullType
+        args.Parts = sub_mdata.Parts
+        args.FullType = sub_mdata.FullType
     end
 
     -- Set general vehicle properties.
 
-    args.EngineLoudness = mdata.EngineLoudness or nil
-    args.EnginePower = mdata.EnginePower or nil
-    args.EngineQuality = mdata.EngineQuality or nil
-    args.HasKey = mdata.HasKey or nil
-    args.MakeKey = (generated_key and true) or (mdata.MakeKey or nil)
-    args.HeadlightsActive = mdata.HeadlightsActive or nil
-    args.HeaterActive = mdata.HeaterActive or nil
-    args.Hotwired = mdata.Hotwired or nil
-    args.Rust = mdata.Rust or nil
-    args.Skin = mdata.Skin or nil
-    args.ModData = mdata.ModData or nil
+    args.EngineLoudness = sub_mdata.EngineLoudness or nil
+    args.EnginePower = sub_mdata.EnginePower or nil
+    args.EngineQuality = sub_mdata.EngineQuality or nil
+    args.HasKey = sub_mdata.HasKey or nil
+    args.MakeKey = (generated_key and true) or (sub_mdata.MakeKey or nil)
+    args.HeadlightsActive = sub_mdata.HeadlightsActive or nil
+    args.HeaterActive = sub_mdata.HeaterActive or nil
+    args.Hotwired = sub_mdata.Hotwired or nil
+    args.Rust = sub_mdata.Rust or nil
+    args.Skin = sub_mdata.Skin or nil
+    args.ModData = sub_mdata.ModData or nil
 
-    args.Blood = mdata.Blood and {
-        F = mdata.Blood.F,
-        B = mdata.Blood.B,
-        L = mdata.Blood.L,
-        R = mdata.Blood.R,
+    args.Blood = sub_mdata.Blood and {
+        F = sub_mdata.Blood.F,
+        B = sub_mdata.Blood.B,
+        L = sub_mdata.Blood.L,
+        R = sub_mdata.Blood.R,
     } or nil
 
-    args.Color = mdata.Color and { H = mdata.Color.H, S = mdata.Color.S, V = mdata.Color.V } or nil
+    args.Color = sub_mdata.Color and
+        { H = sub_mdata.Color.H, S = sub_mdata.Color.S, V = sub_mdata.Color.V } or nil
 
     args.X = player:getX()
     args.Y = player:getY()
