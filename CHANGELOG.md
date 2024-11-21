@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2024-11-21
+
+### Fixed
+
+- Part items not replicating when using a pinkslip.
+
+### Added
+
+- Removes the AVCS claim of a vehicle when converting to a pinkslip. (Maybe in the future make this toggleable?)
+- Make mod data use a sub table with the key of the mod id to prevent mod data table pollution.
+- Properly sync mod data for the vehicle, parts and part items.
+
 ## [0.3.0] - 2024-11-19
 
 ### Added
