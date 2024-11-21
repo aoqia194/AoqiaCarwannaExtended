@@ -82,6 +82,7 @@ mod_constants.FUELTANK_NAMES = { "500FuelTank", "1000FuelTank" }
 --- @field DoVehicleLoot boolean
 --- @field DoCanHotwire boolean
 --- @field DoClearInventory boolean
+--- @field DoRequiresUnclaimed boolean
 --- @field DoFixHiddenParts boolean
 --- @field DoIgnoreHiddenParts boolean
 --- @field DoAllowGeneratedPinkslips boolean

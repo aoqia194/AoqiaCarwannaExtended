@@ -4,6 +4,7 @@ Tooltip_EN = {
     Tooltip_AoqiaCarwannaExtended_HasPassengers = "This vehicle has passengers!",
     Tooltip_AoqiaCarwannaExtended_Hotwired = "This vehicle is hotwired.",
     Tooltip_AoqiaCarwannaExtended_PlayersInInterior = "There are players in the interior!",
+    Tooltip_AoqiaCarwannaExtended_RequiresUnclaimed = "The vehicle is claimed and needs to be unclaimed for conversion!",
 
     Tooltip_AoqiaCarwannaExtended_DoSafehouseOnly = "Can only be claimed in or near a safehouse protected area.",
 
