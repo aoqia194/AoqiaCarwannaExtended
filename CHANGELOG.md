@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2024-11-21
+
+### Fixed
+
+-   Unclaim check not checking permissions properly.
+
+### Added
+
+-   Adds more debug logging to try and pinpoint an issue that I cannot replicate AT ALL.
+
 ## [0.4.0] - 2024-11-21
 
 ### Fixed
