@@ -190,6 +190,8 @@ function commands.spawn_vehicle(player, args)
         for k, v in pairs(mdata) do
             mdata[k] = aoqia_table.deep_copy(v, false, false, nil)
         end
+
+        logger:debug_server("Finished syncing vehicle mod data.")
     end
 
     if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
@@ -222,6 +224,8 @@ function commands.spawn_vehicle(player, args)
         return
     end
 
+    logger:info_server("If we don't get to this point, something is not ok!")
+
     -- Only player-created pinkslips have parts.
     for i = 1, #parts.index do
         repeat
@@ -243,11 +247,14 @@ function commands.spawn_vehicle(player, args)
 
             -- Sync part mod data.
             if pdata.ModData then
+                logger:debug_server("Syncing part mod data.")
+
                 for k, v in pairs(part_mdata) do
                     part_mdata[k] = aoqia_table.deep_copy(v, false, false, nil)
                 end
 
                 vehicle:transmitPartModData(part)
+                logger:debug_server("Finished syncing part mod data.")
             end
 
             -- Check if it's a nodisplay part and ignore it.
@@ -440,6 +447,8 @@ function commands.spawn_vehicle(player, args)
             vehicle:transmitPartModData(part)
         until true
     end
+
+    logger:debug_server("Finished spawning vehicle.")
 end
 
 return commands
