@@ -3,7 +3,8 @@
 -- -------------------------------------------------------------------------- --
 
 -- AoqiaCarwannaExtended requires.
-local aq_math = require("AoqiaZomboidUtilsShared/math")
+local aoqia_table = require("AoqiaZomboidUtilsShared/table")
+local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals.
@@ -157,39 +158,44 @@ function commands.spawn_vehicle(player, args)
 
     -- Give the player a key.
     if args.MakeKey and args.HasKey == nil then
-        logger:debug_server("Attempting to give the player a key.")
+        repeat
+            logger:debug_server("Attempting to give the player a key.")
 
-        local new_key = vehicle:createVehicleKey()
-        if new_key == nil then
-            logger:warn_server("Failed to create vehicle key.")
-        end
+            local new_key = vehicle:createVehicleKey()
+            if new_key == nil then
+                logger:warn_server("Failed to create vehicle key. Not good!!")
+                break
+            end
 
-        if player then
-            -- This might be bugging out. For some reason, it spawns the key in the player's grid square.
-            logger:debug_server("Giving the player a key.")
-            --- @diagnostic disable-next-line: redundant-parameter
-            player:sendObjectChange("addItem", { item = new_key })
-        else
-            logger:warn_server(
-                "Failed to give the player a key as they are nil!")
-            --- @diagnostic disable-next-line
-            square:AddWorldInventoryItem(new_key, x, y, z)
-        end
+            if player then
+                -- FIXME: This might be bugging out. For some reason, it spawns the key in the player's grid square.
+                logger:debug_server("Giving the player a key.")
+
+                --- @diagnostic disable-next-line: redundant-parameter
+                player:sendObjectChange("addItem", { item = new_key })
+            else
+                logger:warn_server(
+                    "Failed to give the player a key as they are nil!")
+                --- @diagnostic disable-next-line: param-type-mismatch
+                square:AddWorldInventoryItem(new_key, x, y, z)
+            end
+        until true
     end
 
-    -- Sync mod data to vehicle.
+    -- Sync vehicle mod data.
+    local mdata = vehicle:getModData()
     if args.ModData then
-        logger:debug_server("Syncing mod data.")
+        logger:debug_server("Syncing vehicle mod data.")
 
-        for k, v in pairs(args.ModData) do
-            vehicle:getModData()[k] = v
+        for k, v in pairs(mdata) do
+            mdata[k] = aoqia_table.deep_copy(v, false, false, nil)
         end
     end
 
     if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
-    and RVInterior and vehicle:getModData().rvInterior then
+    and RVInterior and mdata.rvInterior then
         logger:debug_server("Unassigning vehicle (%s) interior id (%d).", vehicle_id,
-            vehicle:getModData().rvInterior.interiorInstance)
+            mdata.rvInterior.interiorInstance)
 
         -- Tell RV Interior to reset vehicle's interior data.
         sendClientCommand("RVInteriorAdmin", "clientResetVehicle", {
@@ -202,7 +208,10 @@ function commands.spawn_vehicle(player, args)
     -- Check that it's not generated to prevent buffer underflow.
     if sbvars.DoKeepAutoForm and args.Parts then
         --- @diagnostic disable-next-line: redundant-parameter
-        player:sendObjectChange("addItem", { item = InventoryItemFactory.CreateItem("AutoForm") })
+        player:sendObjectChange("addItem", {
+            item = InventoryItemFactory.CreateItem(mod_constants.MOD_ID
+                .. ".AutoForm"),
+        })
     end
 
     local parts = args.Parts
@@ -230,7 +239,19 @@ function commands.spawn_vehicle(player, args)
             local part_type = part:getItemType()
             local part_mdata = part:getModData()
 
+            local pdata = parts.values[i] --[[@as PartIdDummy]]
+
+            -- Sync part mod data.
+            if pdata.ModData then
+                for k, v in pairs(part_mdata) do
+                    part_mdata[k] = aoqia_table.deep_copy(v, false, false, nil)
+                end
+
+                vehicle:transmitPartModData(part)
+            end
+
             -- Check if it's a nodisplay part and ignore it.
+            -- TsarATA's parts are nodisplay but also displayable, so still loop them!
             if  sbvars.DoIgnoreHiddenParts
             and part_cat == "nodisplay"
             and (sbvars.DoCompatTsarMod == false
@@ -267,13 +288,12 @@ function commands.spawn_vehicle(player, args)
                 break
             end
 
-            local part_item = part:getInventoryItem() --[[@as DrainableComboItem]]
+            local part_item = part:getInventoryItem() --[[@as DrainableComboItem | nil]]
             local part_container = part:getItemContainer()
 
             -- logger:debug_server("Found part (%s) with item (%s).", part_id, part_item:getName())
 
             -- Remove part that doesn't exist on pinkslip.
-            local pdata = parts.values[i] --[[@as PartIdDummy]]
             if pdata == nil or pdata.MissingItem then
                 logger:debug_server(
                     "Removing part (%s) because it does not exist on the pinkslip.",
@@ -302,29 +322,34 @@ function commands.spawn_vehicle(player, args)
                 break
             end
 
+            -- TODO: Check if mod data gets synced when swapping the part belolw. If not, sync it.
             -- If the part item installed is not the expected item, uninstall it and install the expected part.
             local part_item_type = part_item and part_item:getFullType() or nil
-            if part_item and part_item_type and part_item_type ~= pdata.ItemFullType then
-                logger:debug_server(
-                    "Uninstalling part (%s) and replacing with (%s).",
-                    part_item_type,
-                    pdata.ItemFullType)
 
-                --- @diagnostic disable-next-line
-                part:setInventoryItem(nil)
-                vehicle:transmitPartItem(part)
+            local needs_swap = (part_item and part_item_type and part_item_type ~= pdata.ItemFullType)
+            if needs_swap or (part_item == nil and part_item_type == nil) then
+                -- If the item already exists and needs swapping, uninstall.
+                if needs_swap then
+                    logger:debug_server(
+                        "Uninstalling part (%s) and replacing with (%s).",
+                        part_item_type,
+                        pdata.ItemFullType)
 
+                    --- @diagnostic disable-next-line
+                    part:setInventoryItem(nil)
+                    vehicle:transmitPartItem(part)
+                end
+
+                -- Part item creation and installation code is the same
+                -- whether the part doesn't exist already and doesn't need swapping
+                -- or if the part exists and needs swapping
                 local item = InventoryItemFactory.CreateItem(pdata.ItemFullType)
                 part:setInventoryItem(item)
-                if sbvars.DoCompatTsarMod and pdata.Model then
+                if sbvars.DoCompatTsarMod and part_mdata.tuning2 and part_mdata.tuning2.model then
                     logger:debug_server(
                         "Attempting to set Tsar model for part (%s).",
                         part_item_type)
 
-                    local tuning = part_mdata.tuning2 or {}
-                    tuning.model = pdata.Model
-
-                    vehicle:transmitPartModData(part)
                     ATATuning2Utils.ModelByItemName(vehicle, part, part_item)
                 end
 
@@ -400,6 +425,16 @@ function commands.spawn_vehicle(player, args)
                 logger:debug_server("Setting part (%s) delta to (%f).", part_id, delta)
                 part_item:setUsedDelta(delta)
                 vehicle:transmitPartUsedDelta(part)
+            end
+
+            -- Sync part item mod data if the part item exists.
+            local part_item_mdata = part_item and part_item:getModData() or nil
+            if part_item_mdata then
+                logger:debug_server("Syncing part item mod data.")
+
+                for k, v in pairs(part_item_mdata) do
+                    part_item_mdata[k] = aoqia_table.deep_copy(v, false, false, nil)
+                end
             end
 
             vehicle:transmitPartModData(part)
