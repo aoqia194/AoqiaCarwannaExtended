@@ -6,7 +6,7 @@ IGUI_EN = {
     IGUI_AoqiaCarwannaExtended_ConfirmText = "Convert %1 into a Pinkslip?",
     IGUI_AoqiaCarwannaExtended_ConfirmInteriorWarning = "This vehicle's interior will be DELETED!",
 
-    // IGUI_AoqiaCarwannaExtended_VehicleName = "Vehicle Name: %1",
+    IGUI_AoqiaCarwannaExtended_VehicleName = "Vehicle Name: %1",
     IGUI_AoqiaCarwannaExtended_VehicleSkin = "Body Style: %1",
     IGUI_AoqiaCarwannaExtended_HasKey = "Has Key: %1",
     IGUI_AoqiaCarwannaExtended_Hotwired = "Hotwired: %1",
