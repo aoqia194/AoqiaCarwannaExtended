@@ -32,7 +32,9 @@ function create_pinkslip:is_part_missing(part)
 end
 
 function create_pinkslip:isValid()
-    return self.vehicle and self.vehicle:isRemovedFromWorld() == false
+    return self.vehicle
+        and self.vehicle:isRemovedFromWorld() == false
+        and getPlayer():getZ() == 0
 end
 
 function create_pinkslip:waitToStart()
