@@ -1,6 +1,6 @@
--- -------------------------------------------------------------------------- --
---                                    wawa                                    --
--- -------------------------------------------------------------------------- --
+-- -------------------------------------------- --
+-- PINKSLIP CLAIM UI                            --
+-- -------------------------------------------- --
 
 -- My requires.
 local constants = require("AoqiaZomboidUtilsShared/constants")
@@ -12,9 +12,7 @@ require("luautils")
 
 -- std globals.
 local math = math
-local table = table
 -- TIS globals.
-local getSquare = getSquare
 local getText = getText
 local ISModalRichText = ISModalRichText
 local ISTimedActionQueue = ISTimedActionQueue
@@ -68,19 +66,13 @@ function pinkslip.confirm_dialog(player, vehicle)
 
     local player_num = player:getPlayerNum()
 
-    local interior_warning = nil
-    if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
-    and RVInterior and RVInterior.vehicleHasInteriorParameters(vehicle) then
-        interior_warning = getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID))
-    end
+    local interior_warning = (sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
+            and RVInterior and RVInterior.vehicleHasInteriorParameters(vehicle)) and
+        getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID)) or ""
 
     local confirm_text = getText(("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
             getText("IGUI_VehicleName" .. vehicle:getScript():getName()))
-        .. " <LINE> <RGB:1,0,0> "
-
-    if interior_warning then
-        confirm_text = confirm_text .. interior_warning
-    end
+        .. (interior_warning ~= "") and (" <LINE> <RGB:1,0,0> " .. interior_warning) or ""
 
     local modal = ISModalRichText:new(
         0,
@@ -473,6 +465,14 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         text = text
             .. " <LINE> <LINE> <RGB:1,0,0> "
             .. getText(("Tooltip_%s_RequiresUnclaimed"):format(mod_constants.MOD_ID))
+        not_available = true
+    end
+
+    -- If the player is above Z level 0.
+    if player:getZ() > 0 then
+        text = text
+            .. "<LINE> <LINE> <RGB:1,0,0> "
+            .. getText(("Tooltip_%s_AboveZLevel"):format(mod_constants.MOD_ID))
         not_available = true
     end
 
