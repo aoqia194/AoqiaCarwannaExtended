@@ -83,8 +83,6 @@ function tooltip.modified_render(self, hard_width)
     self.tooltip:setX(x)
     self.tooltip:setY(y)
 
-    logger:debug("w = %d, h = %d", tw, th)
-
     self:setX(x - 11)
     self:setY(y)
     self:setWidth(hard_width or (tw + 11))
@@ -132,7 +130,7 @@ function tooltip.render(self)
 
     --- @type InventoryItem
     local item = self.item
-    if item == nil or item:getFullType() ~= (mod_constants.MOD_ID .. "AutoForm") then
+    if item == nil or item:getFullType() ~= (mod_constants.MOD_ID .. ".Pinkslip") then
         tooltip.o_tooltip_render(self)
         return
     end
@@ -146,7 +144,8 @@ function tooltip.render(self)
         .. " <LINE> "
         .. getText(("IGUI_%s_VehicleSkin"):format(mod_constants.MOD_ID), mdata.Skin)
         .. " <LINE> "
-        .. getText(("IGUI_%s_HasKey"):format(mod_constants.MOD_ID), mdata.HasKey and "Yes" or "No")
+        .. getText(("IGUI_%s_HasKey"):format(mod_constants.MOD_ID),
+            mdata.HasKey and "Yes" or "No")
         .. " <LINE> "
         .. getText(("IGUI_%s_Hotwired"):format(mod_constants.MOD_ID),
             mdata.Hotwired and "Yes" or "No")
