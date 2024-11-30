@@ -1,10 +1,5 @@
--- -------------------------------------------------------------------------- --
---                       Sandbox Options Blacklist Stuff                      --
--- -------------------------------------------------------------------------- --
-
 -- AoqiaCarwannaExtended requires.
 local aoqia_table = require("AoqiaZomboidUtilsShared/table")
-local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 
 -- std globals.
@@ -35,7 +30,7 @@ function commands.spawn_vehicle(player, args)
     local square = player:getSquare()
 
     logger:info_server("Spawning vehicle (%s) at (%f, %f, %f).",
-        tostring(args.FullType), x, y, z)
+        tostring(args.FullType), x, y, 0)
 
     -- Check if player is on Z level 0.
     -- The engine is limited to only spawning vehicles on Z-level 0.
