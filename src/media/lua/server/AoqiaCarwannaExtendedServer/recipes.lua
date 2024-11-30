@@ -1,7 +1,3 @@
--- -------------------------------------------------------------------------- --
---                       Sandbox Options Blacklist Stuff                      --
--- -------------------------------------------------------------------------- --
-
 -- AoqiaCarwannaExtended requires.
 local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
@@ -13,7 +9,6 @@ local assert = assert
 -- TIS globals cache.
 local getAllVehicles = getAllVehicles
 local getScriptManager = getScriptManager
-local getSquare = getSquare
 local Recipe = Recipe
 local sendClientCommand = sendClientCommand
 local ZombRand = ZombRand
@@ -38,6 +33,17 @@ end
 --- @type Recipe_OnCanPerform
 Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, player, item)
     --- @cast player IsoPlayer
+    if player:getZ() > 0 then
+        player:setHaloNote(
+            getText(("IGUI_%s_HaloNote_NotOnGround"):format(mod_constants.MOD_ID)),
+            255.0,
+            0.0,
+            0.0,
+            (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
+
+        logger:debug_server("Failed to spawn vehicle as the player is above Z level 0.")
+        return false
+    end
 
     -- If the item is nil. it means that crafting menu is checking it.
     -- if item == nil then return false end
@@ -284,7 +290,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
 
     args.X = player:getX()
     args.Y = player:getY()
-    args.Z = player:getZ()
+    args.Z = 0 -- Vehicles can't spawn past level 0
     args.Dir = player:getDir()
 
     sendClientCommand(player, mod_constants.MOD_ID, "spawn_vehicle", args)
