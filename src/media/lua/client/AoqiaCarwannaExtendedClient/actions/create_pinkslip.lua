@@ -32,7 +32,9 @@ function create_pinkslip:is_part_missing(part)
 end
 
 function create_pinkslip:isValid()
-    return self.vehicle and self.vehicle:isRemovedFromWorld() == false
+    return self.vehicle
+        and self.vehicle:isRemovedFromWorld() == false
+        and getPlayer():getZ() == 0
 end
 
 function create_pinkslip:waitToStart()
@@ -72,17 +74,11 @@ function create_pinkslip:perform()
         pinkslip:setWeight(self.vehicle:getWeight())
     end
 
-    local mdata = pinkslip:getModData() --[[@as ModDataDummy]]
-
     -- Make sure the table exists in the pinkslip.
-    local sub_mdata = nil --[[@as ModDataDummy | nil]]
-    if mdata and mdata[mod_constants.MOD_ID] == nil then
-        mdata[mod_constants.MOD_ID] = {}
-        sub_mdata = mdata[mod_constants.MOD_ID]
-    end
-
-    if sub_mdata == nil then
-        logger:warn("Pinkslip sub_mdata failed to create/retrieve. THIS IS SO BAD!!!")
+    --- @type ModDataDummy | nil
+    local mdata = aoqia_table.init_mdata(pinkslip, mod_constants.MOD_ID)
+    if mdata == nil then
+        logger:warn("Pinkslip mdata failed to create/retrieve. THIS IS SO BAD!!!")
         return
     end
 
@@ -96,44 +92,44 @@ function create_pinkslip:perform()
     end
 
     if veh_mdata and has_mdata then
-        sub_mdata.ModData = aoqia_table.shallow_copy(veh_mdata)
+        mdata.ModData = aoqia_table.shallow_copy(veh_mdata)
     end
 
-    if sub_mdata.Parts and sub_mdata.Parts.index and sub_mdata.Parts.values then
-        sub_mdata.Parts = sub_mdata.Parts
+    if mdata.Parts and mdata.Parts.index and mdata.Parts.values then
+        mdata.Parts = mdata.Parts
     else
         --- @diagnostic disable-next-line: assign-type-mismatch
-        sub_mdata.Parts = { index = {}, values = {} }
+        mdata.Parts = { index = {}, values = {} }
     end
 
-    sub_mdata.Blood = sub_mdata.Blood or {}
-    sub_mdata.Color = sub_mdata.Color or {}
+    mdata.Blood = mdata.Blood or {}
+    mdata.Color = mdata.Color or {}
 
-    sub_mdata.Blood.F = self.vehicle:getBloodIntensity("Front")
-    sub_mdata.Blood.B = self.vehicle:getBloodIntensity("Rear")
-    sub_mdata.Blood.L = self.vehicle:getBloodIntensity("Left")
-    sub_mdata.Blood.R = self.vehicle:getBloodIntensity("Right")
-    sub_mdata.Color.H = self.vehicle:getColorHue()
-    sub_mdata.Color.S = self.vehicle:getColorSaturation()
-    sub_mdata.Color.V = self.vehicle:getColorValue()
-    sub_mdata.EngineLoudness = self.vehicle:getEngineLoudness()
-    sub_mdata.EnginePower = self.vehicle:getEnginePower()
-    sub_mdata.EngineQuality = self.vehicle:getEngineQuality()
-    sub_mdata.HasKey = self.vehicle:isKeysInIgnition()
-    sub_mdata.HeadlightsActive = self.vehicle:getHeadlightsOn()
-    sub_mdata.Hotwired = self.vehicle:isHotwired()
-    sub_mdata.Skin = self.vehicle:getSkinIndex()
-    sub_mdata.Rust = self.vehicle:getRust()
-    sub_mdata.FullType = vehicle_script:getFullName()
-    sub_mdata.Name = vehicle_name
+    mdata.Blood.F = self.vehicle:getBloodIntensity("Front")
+    mdata.Blood.B = self.vehicle:getBloodIntensity("Rear")
+    mdata.Blood.L = self.vehicle:getBloodIntensity("Left")
+    mdata.Blood.R = self.vehicle:getBloodIntensity("Right")
+    mdata.Color.H = self.vehicle:getColorHue()
+    mdata.Color.S = self.vehicle:getColorSaturation()
+    mdata.Color.V = self.vehicle:getColorValue()
+    mdata.EngineLoudness = self.vehicle:getEngineLoudness()
+    mdata.EnginePower = self.vehicle:getEnginePower()
+    mdata.EngineQuality = self.vehicle:getEngineQuality()
+    mdata.HasKey = self.vehicle:isKeysInIgnition()
+    mdata.HeadlightsActive = self.vehicle:getHeadlightsOn()
+    mdata.Hotwired = self.vehicle:isHotwired()
+    mdata.Skin = self.vehicle:getSkinIndex()
+    mdata.Rust = self.vehicle:getRust()
+    mdata.FullType = vehicle_script:getFullName()
+    mdata.Name = vehicle_name
 
     local key = player_inventory:haveThisKeyId(self.vehicle:getKeyId())
-    if key and sub_mdata.HasKey == false then
-        sub_mdata.MakeKey = true
+    if key and mdata.HasKey == false then
+        mdata.MakeKey = true
         player_inventory:Remove(key --[[@as string]])
     end
 
-    local parts = sub_mdata.Parts
+    local parts = mdata.Parts
     -- Should never happen~
     if parts == nil then return end
 
@@ -251,8 +247,8 @@ function create_pinkslip:perform()
     logger:debug("Vehicle part item weights combined: (%d)", weight)
     logger:debug("Total vehicle weight calculated: (%d)", weight + vehicle_script:getMass())
 
-    sub_mdata.PartsDamaged = damaged_parts
-    sub_mdata.PartsMissing = missing_parts
+    mdata.PartsDamaged = damaged_parts
+    mdata.PartsMissing = missing_parts
 
     -- Remove form item if required.
     if sbvars.DoRequiresAutoForm then

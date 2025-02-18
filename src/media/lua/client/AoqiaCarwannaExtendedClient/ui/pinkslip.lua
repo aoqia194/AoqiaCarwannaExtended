@@ -1,8 +1,9 @@
--- -------------------------------------------------------------------------- --
---                                    wawa                                    --
--- -------------------------------------------------------------------------- --
+-- -------------------------------------------- --
+-- PINKSLIP CLAIM UI                            --
+-- -------------------------------------------- --
 
 -- My requires.
+local aoqia_table = require("AoqiaZomboidUtilsShared/table")
 local constants = require("AoqiaZomboidUtilsShared/constants")
 local create_pinkslip = require("AoqiaCarwannaExtendedClient/actions/create_pinkslip")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
@@ -12,9 +13,7 @@ require("luautils")
 
 -- std globals.
 local math = math
-local table = table
 -- TIS globals.
-local getSquare = getSquare
 local getText = getText
 local ISModalRichText = ISModalRichText
 local ISTimedActionQueue = ISTimedActionQueue
@@ -68,19 +67,13 @@ function pinkslip.confirm_dialog(player, vehicle)
 
     local player_num = player:getPlayerNum()
 
-    local interior_warning = nil
-    if  sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
-    and RVInterior and RVInterior.vehicleHasInteriorParameters(vehicle) then
-        interior_warning = getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID))
-    end
+    local interior_warning = ((sbvars.DoCompatRvInteriors and sbvars.DoUnassignInterior
+            and RVInterior and RVInterior.vehicleHasInteriorParameters(vehicle)) and
+        getText(("IGUI_%s_ConfirmInteriorWarning"):format(mod_constants.MOD_ID)) or "")
 
     local confirm_text = getText(("IGUI_%s_ConfirmText"):format(mod_constants.MOD_ID),
             getText("IGUI_VehicleName" .. vehicle:getScript():getName()))
-        .. " <LINE> <RGB:1,0,0> "
-
-    if interior_warning then
-        confirm_text = confirm_text .. interior_warning
-    end
+        .. ((interior_warning ~= "") and (" <LINE> <RGB:1,0,0> " .. interior_warning) or "")
 
     local modal = ISModalRichText:new(
         0,
@@ -104,8 +97,7 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
     local sbvars = SandboxVars[mod_constants.MOD_ID] --[[@as SandboxVarsDummy]]
     if sbvars.DoRegistration == false then return end
 
-    local mdata = vehicle:getModData() --[[@as ModDataDummy]]
-
+    local mdata = aoqia_table.init_mdata(vehicle, mod_constants.MOD_ID) --[[@as ModDataDummy]]
     local player_inv = player:getInventory()
 
     local vehicle_script = vehicle:getScript()
@@ -363,10 +355,54 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
             "adding option failed: Vehicle blacklisted from pinkslip use.")
     end
 
-    -- If safehouse only.
-    if constants.IS_SINGLEPLAYER == false and sbvars.DoSafehouseOnly then
-        local username = player:getUsername()
+    if not_available == false and sbvars.DoParkingMeterOnly then
+        local found_meter = false
 
+        local sq = vehicle:getSquare()
+        local sq_x = sq:getX()
+        local sq_y = sq:getY()
+
+        local dist = math.ceil(sbvars.ParkingMeterDistance / 2)
+        for x = sq_x - dist, sq_x + dist do
+            for y = sq_y - dist, sq_y + dist do
+                repeat
+                    local s = getSquare(x, y, 0)
+                    if s == nil then break end
+
+                    local s_objs = s:getObjects()
+                    for i = 1, s_objs:size() do
+                        local obj = s_objs:get(i - 1) --[[@as IsoObject]]
+                        local obj_name = obj:getSprite():getName()
+                        if obj_name == "f_parkingmeters_01_0"
+                        or obj_name == "f_parkingmeters_01_1"
+                        or obj_name == "f_parkingmeters_01_2"
+                        or obj_name == "f_parkingmeters_01_3"
+                        or obj_name == "f_parkingmeters_01_4"
+                        or obj_name == "f_parkingmeters_01_5"
+                        or obj_name == "f_parkingmeters_01_6"
+                        or obj_name == "f_parkingmeters_01_7" then
+                            found_meter = true
+                            break
+                        end
+                    end
+                until true
+            end
+
+            if found_meter then break end
+        end
+
+        if found_meter == false then
+            text = text
+                .. " <LINE> <LINE> <RGB:1,0,0> "
+                .. getText(("Tooltip_%s_NoParkingMeterFound"):format(mod_constants.MOD_ID))
+            not_available = true
+        end
+    end
+
+    if not_available == false and constants.IS_SINGLEPLAYER == false and sbvars.DoSafehouseOnly then
+        local found_safehouse = false
+
+        local username = player:getUsername()
         local veh_sq = vehicle:getSquare()
         local veh_sq_x = veh_sq:getX()
         local veh_sq_y = veh_sq:getY()
@@ -439,9 +475,15 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         if sq_dist == nil
         or (sbvars.SafehouseDistance == 0 and in_safehouse_area == false)
         or (sbvars.SafehouseDistance > 0 and sq_dist > sbvars.SafehouseDistance) then
+            found_safehouse = false
+        else
+            found_safehouse = true
+        end
+
+        if found_safehouse == false then
             text = text
                 .. " <LINE> <LINE> <RGB:1,0,0> "
-                .. getText(("Tooltip_%s_DoSafehouseOnly"):format(mod_constants.MOD_ID))
+                .. getText(("Tooltip_%s_NoSafehouseFound"):format(mod_constants.MOD_ID))
             not_available = true
         end
     end
@@ -473,6 +515,14 @@ function pinkslip.add_option_to_menu(player, context, vehicle)
         text = text
             .. " <LINE> <LINE> <RGB:1,0,0> "
             .. getText(("Tooltip_%s_RequiresUnclaimed"):format(mod_constants.MOD_ID))
+        not_available = true
+    end
+
+    -- If the player is above Z level 0.
+    if player:getZ() > 0 then
+        text = text
+            .. "<LINE> <LINE> <RGB:1,0,0> "
+            .. getText(("Tooltip_%s_AboveZLevel"):format(mod_constants.MOD_ID))
         not_available = true
     end
 
