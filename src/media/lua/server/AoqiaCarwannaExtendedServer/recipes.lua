@@ -97,7 +97,11 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
                         if obj_name == "f_parkingmeters_01_0"
                         or obj_name == "f_parkingmeters_01_1"
                         or obj_name == "f_parkingmeters_01_2"
-                        or obj_name == "f_parkingmeters_01_3" then
+                        or obj_name == "f_parkingmeters_01_3"
+                        or obj_name == "f_parkingmeters_01_4"
+                        or obj_name == "f_parkingmeters_01_5"
+                        or obj_name == "f_parkingmeters_01_6"
+                        or obj_name == "f_parkingmeters_01_7" then
                             found_meter = true
                             break
                         end
