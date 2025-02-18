@@ -1,6 +1,6 @@
-# Credits
+# Licensed Content
 
-### 3rd Party Assets
+### 3rd-party sounds
 - The following sounds are used under the Mixkit Sound Effects Free License
 mixkit-fast-signing-with-a-pen-2370
 mixkit-signing-on-a-paper-2368

@@ -335,6 +335,37 @@ option AoqiaCarwannaExtended.SafehouseDistance
 	translation = AoqiaCarwannaExtended_SafehouseDistance,
 }
 
+/* Parking Meter ------------------------------ */
+
+option AoqiaCarwannaExtended.SeparatorParkingMeter
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_SeparatorParkingMeter,
+}
+
+option AoqiaCarwannaExtended.DoParkingMeterOnly
+{
+	type = boolean,
+	default = false,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_DoParkingMeterOnly,
+}
+
+option AoqiaCarwannaExtended.ParkingMeterDistance
+{
+	type = integer,
+	default = 20,
+	min = 0,
+	max = 1000,
+
+	page = AoqiaCarwannaExtended,
+	translation = AoqiaCarwannaExtended_ParkingMeterDistance,
+}
+
 /* Zombie Loot -------------------------------- */
 
 option AoqiaCarwannaExtended.SeparatorZombieLoot

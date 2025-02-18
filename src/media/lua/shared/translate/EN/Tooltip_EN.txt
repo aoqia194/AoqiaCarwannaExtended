@@ -7,7 +7,8 @@ Tooltip_EN = {
     Tooltip_AoqiaCarwannaExtended_RequiresUnclaimed = "The vehicle is claimed and needs to be unclaimed for conversion!",
     Tooltip_AoqiaCarwannaExtended_AboveZLevel = "You need to be on the ground floor to claim a pinkslip!",
 
-    Tooltip_AoqiaCarwannaExtended_DoSafehouseOnly = "Can only be claimed in or near a safehouse protected area.",
+    Tooltip_AoqiaCarwannaExtended_NoSafehouseFound = "Can only be claimed in or near a safehouse protected area.",
+    Tooltip_AoqiaCarwannaExtended_NoParkingMeterFound = "Can only be claimed near a parking meter.",
 
     Tooltip_AoqiaCarwannaExtended_HasItems = "There are items in these parts' containers:",
     Tooltip_AoqiaCarwannaExtended_PartsMissing = "These parts are missing:",

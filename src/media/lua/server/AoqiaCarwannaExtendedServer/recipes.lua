@@ -1,4 +1,4 @@
--- AoqiaCarwannaExtended requires.
+local aoqia_table = require("AoqiaZomboidUtilsShared/table")
 local constants = require("AoqiaZomboidUtilsShared/constants")
 local mod_constants = require("AoqiaCarwannaExtendedShared/mod_constants")
 local sandbox_data = require("AoqiaCarwannaExtendedShared/sandbox_data")
@@ -76,8 +76,51 @@ Recipe.OnCanPerform[mod_constants.MOD_ID].ClaimVehicle = function (recipe, playe
         perform = false
     end
 
+    if perform and sbvars.DoParkingMeterOnly then
+        local found_meter = false
+
+        local sq = player:getSquare()
+        local sq_x = sq:getX()
+        local sq_y = sq:getY()
+
+        local dist = math.ceil(sbvars.ParkingMeterDistance / 2)
+        for x = sq_x - dist, sq_x + dist do
+            for y = sq_y - dist, sq_y + dist do
+                repeat
+                    local s = getSquare(x, y, 0)
+                    if s == nil then break end
+
+                    local s_objs = s:getObjects()
+                    for i = 1, s_objs:size() do
+                        local obj = s_objs:get(i - 1) --[[@as IsoObject]]
+                        local obj_name = obj:getSprite():getName()
+                        if obj_name == "f_parkingmeters_01_0"
+                        or obj_name == "f_parkingmeters_01_1"
+                        or obj_name == "f_parkingmeters_01_2"
+                        or obj_name == "f_parkingmeters_01_3" then
+                            found_meter = true
+                            break
+                        end
+                    end
+                until true
+            end
+
+            if found_meter then break end
+        end
+
+        if found_meter == false then
+            player:setHaloNote(
+                getText(("Tooltip_%s_NoParkingMeterFound"):format(mod_constants.MOD_ID)),
+                255.0, 0.0, 0.0,
+                (128.0 * 2)) --- @diagnostic disable-line: redundant-parameter
+            logger:debug_server(
+                "Failed to spawn vehicle as the player is not in range of a parking meter.")
+            perform = false
+        end
+    end
+
     -- If we need to be in a safehouse to spawn the vehicle.
-    if constants.IS_SINGLEPLAYER == false and sbvars.DoSafehouseOnly then
+    if perform and constants.IS_SINGLEPLAYER == false and sbvars.DoSafehouseOnly then
         local username = player:getUsername()
 
         local player_sq_x = player_sq:getX()
@@ -179,16 +222,8 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
 
     --- @diagnostic disable-next-line: undefined-field
 
-    local mdata = item:getModData()
-
-    -- Make sure the table exists in the pinkslip.
-    local sub_mdata = nil --[[@as ModDataDummy | nil]]
-    if mdata and mdata[mod_constants.MOD_ID] == nil then
-        mdata[mod_constants.MOD_ID] = {}
-    end
-    sub_mdata = mdata[mod_constants.MOD_ID]
-
-    if sub_mdata == nil then
+    local mdata = aoqia_table.init_mdata(item, mod_constants.MOD_ID)
+    if mdata == nil then
         logger:warn_server("Pinkslip sub_mdata failed to create/retrieve. THIS IS SO BAD!!!")
         return
     end
@@ -198,7 +233,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
     -- If there are no parts, it means the pinkslip isn't player-made.
     -- We have to handle it differently because it will not have stored any proper data for parts.
     local generated_key = false
-    if sub_mdata.Parts == nil then
+    if mdata.Parts == nil then
         if sbvars.DoAllowGeneratedPinkslips == false then
             player:setHaloNote(
                 getText(("IGUI_%s_HaloNote_NoGeneratedPinkslips"):format(mod_constants.MOD_ID)),
@@ -221,7 +256,7 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
                 return
             end
 
-            vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size() - 1)) --[[@as string]]
+            vehicle_name = vehicle_names:get(ZombRand(0, vehicle_names:size())) --[[@as string]]
             local name_lower = vehicle_name:lower()
 
             local blacklisted = sandbox_data.pinkslip_blacklist.index[vehicle_name] ~= nil
@@ -260,33 +295,33 @@ Recipe.OnCreate[mod_constants.MOD_ID].ClaimVehicle = function (
         -- generated_key = ZombRand(0, 100) <= 25 and true or false
         generated_key = true
     else
-        args.Parts = sub_mdata.Parts
-        args.FullType = sub_mdata.FullType
+        args.Parts = mdata.Parts
+        args.FullType = mdata.FullType
     end
 
     -- Set general vehicle properties.
 
-    args.EngineLoudness = sub_mdata.EngineLoudness or nil
-    args.EnginePower = sub_mdata.EnginePower or nil
-    args.EngineQuality = sub_mdata.EngineQuality or nil
-    args.HasKey = sub_mdata.HasKey or nil
-    args.MakeKey = (generated_key and true) or (sub_mdata.MakeKey or nil)
-    args.HeadlightsActive = sub_mdata.HeadlightsActive or nil
-    args.HeaterActive = sub_mdata.HeaterActive or nil
-    args.Hotwired = sub_mdata.Hotwired or nil
-    args.Rust = sub_mdata.Rust or nil
-    args.Skin = sub_mdata.Skin or nil
-    args.ModData = sub_mdata.ModData or nil
+    args.EngineLoudness = mdata.EngineLoudness or nil
+    args.EnginePower = mdata.EnginePower or nil
+    args.EngineQuality = mdata.EngineQuality or nil
+    args.HasKey = mdata.HasKey or nil
+    args.MakeKey = (generated_key and true) or (mdata.MakeKey or nil)
+    args.HeadlightsActive = mdata.HeadlightsActive or nil
+    args.HeaterActive = mdata.HeaterActive or nil
+    args.Hotwired = mdata.Hotwired or nil
+    args.Rust = mdata.Rust or nil
+    args.Skin = mdata.Skin or nil
+    args.ModData = mdata.ModData or nil
 
-    args.Blood = sub_mdata.Blood and {
-        F = sub_mdata.Blood.F,
-        B = sub_mdata.Blood.B,
-        L = sub_mdata.Blood.L,
-        R = sub_mdata.Blood.R,
+    args.Blood = mdata.Blood and {
+        F = mdata.Blood.F,
+        B = mdata.Blood.B,
+        L = mdata.Blood.L,
+        R = mdata.Blood.R,
     } or nil
 
-    args.Color = sub_mdata.Color and
-        { H = sub_mdata.Color.H, S = sub_mdata.Color.S, V = sub_mdata.Color.V } or nil
+    args.Color = mdata.Color and
+        { H = mdata.Color.H, S = mdata.Color.S, V = mdata.Color.V } or nil
 
     args.X = player:getX()
     args.Y = player:getY()

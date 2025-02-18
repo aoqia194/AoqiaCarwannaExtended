@@ -106,6 +106,15 @@ Sandbox_EN = {
     Sandbox_AoqiaCarwannaExtended_SafehouseDistance = "Safehouse Distance",
     Sandbox_AoqiaCarwannaExtended_SafehouseDistance_tooltip = "The minimum distance (in tiles) the player needs to be from their safehouse to be able to spawn a vehicle.",
 
+    /* Parking Meter -------------------------- */
+    Sandbox_AoqiaCarwannaExtended_SeparatorParkingMeter = "-------- Parking Meter --------",
+
+    Sandbox_AoqiaCarwannaExtended_DoParkingMeterOnly = "Parking Meter Only",
+    Sandbox_AoqiaCarwannaExtended_DoParkingMeterOnly_tooltip = "Require a player to be near a parking meter to be able to spawn a vehicle. Optionally, you can use this in conjunction with Safehouse Only option if you want to.",
+
+    Sandbox_AoqiaCarwannaExtended_ParkingMeterDistance = "Parking Meter Distance",
+    Sandbox_AoqiaCarwannaExtended_ParkingMeterDistance_tooltip = "The minimum distance (in tiles) the player needs to be from a parking meter to be able to spawn a vehicle.",
+
     /* Zombie Loot ---------------------------- */
     Sandbox_AoqiaCarwannaExtended_SeparatorZombieLoot = "-------- Zombie Loot --------",
 

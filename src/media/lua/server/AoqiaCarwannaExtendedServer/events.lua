@@ -25,8 +25,8 @@ function events.on_client_command(module, command, player, args)
         return
     end
 
-    logger:info_server("Received client command (%s) from player (%s) <%s>.", command,
-        player:getUsername(), tostring(getSteamIDFromUsername(player:getUsername())))
+    logger:info_server("Received client command (%s) from player (%s) <%f>.", command,
+        player:getUsername(), player:getSteamID())
     commands[command](player, args)
 end
 
